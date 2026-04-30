@@ -2736,6 +2736,7 @@ do
 
     Library.Watermark = WatermarkOuter;
     Library.WatermarkText = WatermarkLabel;
+    Library.WatermarkLine = WatermarkLine;
     Library:MakeDraggable(Library.Watermark);
 
     local KeybindOuter = Library:Create('Frame', {
@@ -2819,7 +2820,7 @@ function Library:SetWatermark(Text)
     Library.Watermark.Size = UDim2.new(0, TotalWidth, 0, 22);
     Library.WatermarkText.Text = Text;
 
-    WatermarkLine.Size = UDim2.new(0, math.floor(TotalWidth * 0.55), 0, 1);
+    Library.WatermarkLine.Size = UDim2.new(0, math.floor(TotalWidth * 0.55), 0, 1);
 
     Library:SetWatermarkVisibility(true);
 end;
