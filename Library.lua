@@ -2920,15 +2920,6 @@ function Library:Notify(Text, Time)
         Parent = InnerFrame;
     })
 
-    local AccentBar = Library:Create('Frame', {
-        BackgroundColor3 = Library.AccentColor;
-        BorderSizePixel = 0;
-        Position = UDim2.new(0, 0, 0, 0);
-        Size = UDim2.new(0, 3, 1, 0);
-        ZIndex = 104;
-        Parent = NotifyOuter;
-    })
-
     -- Progress bar
     local ProgressBg = Library:Create('Frame', {
         BackgroundColor3 = Color3.fromRGB(0, 0, 0);
