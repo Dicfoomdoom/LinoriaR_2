@@ -32,7 +32,7 @@ local Library = {
     FontColor = Color3.fromRGB(255, 255, 255);
     MainColor = Color3.fromRGB(12, 12, 12);
     BackgroundColor = Color3.fromRGB(8, 8, 8);
-    AccentColor = Color3.fromRGB(0, 85, 255);
+    AccentColor = Color3.fromRGB(0, 255, 0);
     OutlineColor = Color3.fromRGB(12, 12, 12);
     RiskColor = Color3.fromRGB(255, 50, 50),
 
@@ -2928,11 +2928,6 @@ function Library:Notify(Text, Time)
         ZIndex = 104;
         Parent = NotifyOuter;
     })
-    Library:Create('UICorner', { CornerRadius = UDim.new(0, 2); Parent = AccentBar })
-
-    Library:AddToRegistry(AccentBar, {
-        BackgroundColor3 = 'AccentColor';
-    }, true)
 
     -- Progress bar
     local ProgressBg = Library:Create('Frame', {
