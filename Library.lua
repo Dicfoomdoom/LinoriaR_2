@@ -2857,18 +2857,6 @@ function Library:Notify(Text, Time)
         Parent = Library.NotificationArea;
     })
 
-    -- Shadow
-    local Shadow = Library:Create('Frame', {
-        BackgroundColor3 = Color3.fromRGB(0, 0, 0);
-        BackgroundTransparency = 0.75;
-        BorderSizePixel = 0;
-        Position = UDim2.new(0, 2, 0, 2);
-        Size = UDim2.new(1, 0, 1, 0);
-        ZIndex = 99;
-        Parent = NotifyOuter;
-    })
-    Library:Create('UICorner', { CornerRadius = UDim.new(0, 5); Parent = Shadow })
-
     local NotifyInner = Library:Create('Frame', {
         BackgroundColor3 = Library.MainColor;
         BorderSizePixel = 0;
@@ -2876,7 +2864,6 @@ function Library:Notify(Text, Time)
         ZIndex = 101;
         Parent = NotifyOuter;
     })
-    Library:Create('UICorner', { CornerRadius = UDim.new(0, 5); Parent = NotifyInner })
 
     Library:AddToRegistry(NotifyInner, {
         BackgroundColor3 = 'MainColor';
@@ -2890,7 +2877,6 @@ function Library:Notify(Text, Time)
         ZIndex = 102;
         Parent = NotifyInner;
     })
-    Library:Create('UICorner', { CornerRadius = UDim.new(0, 5); Parent = InnerFrame })
 
     local Gradient = Library:Create('UIGradient', {
         Color = ColorSequence.new({
@@ -2920,7 +2906,6 @@ function Library:Notify(Text, Time)
         Parent = InnerFrame;
     })
 
-    -- Progress bar
     local ProgressBg = Library:Create('Frame', {
         BackgroundColor3 = Color3.fromRGB(0, 0, 0);
         BackgroundTransparency = 0.65;
@@ -2930,7 +2915,6 @@ function Library:Notify(Text, Time)
         ZIndex = 105;
         Parent = NotifyOuter;
     })
-    Library:Create('UICorner', { CornerRadius = UDim.new(1, 0); Parent = ProgressBg })
 
     local ProgressFill = Library:Create('Frame', {
         BackgroundColor3 = Library.AccentColor;
@@ -2939,28 +2923,24 @@ function Library:Notify(Text, Time)
         ZIndex = 106;
         Parent = ProgressBg;
     })
-    Library:Create('UICorner', { CornerRadius = UDim.new(1, 0); Parent = ProgressFill })
 
     Library:AddToRegistry(ProgressFill, {
         BackgroundColor3 = 'AccentColor';
     }, true)
 
-    -- Slide in
     pcall(NotifyOuter.TweenSize, NotifyOuter,
         UDim2.new(0, totalWidth, 0, YSize),
         'Out', 'Quart', 0.35, true)
 
     task.spawn(function()
-        wait(0.35) -- wait for slide-in
+        wait(2)
 
-        -- Drain progress bar over Time
         pcall(ProgressFill.TweenSize, ProgressFill,
             UDim2.new(0, 0, 1, 0),
             'In', 'Linear', Time, true)
 
         wait(Time)
 
-        -- Slide out
         pcall(NotifyOuter.TweenSize, NotifyOuter,
             UDim2.new(0, 0, 0, YSize),
             'In', 'Quart', 0.3, true)
