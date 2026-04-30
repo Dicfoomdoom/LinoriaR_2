@@ -2697,7 +2697,7 @@ do
 
     local WatermarkOuter = Library:Create('Frame', {
         AnchorPoint = Vector2.new(0.5, 0);
-        BackgroundTransparency = 1;
+        BackgroundTransparency = 0;
         BorderSizePixel = 0;
         Position = UDim2.new(0.5, 0, 0, 6);
         Size = UDim2.new(0, 200, 0, 22);
