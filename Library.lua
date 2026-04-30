@@ -2843,9 +2843,9 @@ end;
 
 function Library:Notify(Text, Time)
     local XSize, YSize = Library:GetTextBounds(Text, Library.Font, 13)
-
     YSize = YSize + 14
-    local totalWidth = XSize + 16
+    local timerWidth = 28
+    local totalWidth = XSize + 16 + timerWidth
 
     local NotifyOuter = Library:Create('Frame', {
         BorderSizePixel = 0;
@@ -2856,7 +2856,6 @@ function Library:Notify(Text, Time)
         ZIndex = 100;
         Parent = Library.NotificationArea;
     })
-
     local NotifyInner = Library:Create('Frame', {
         BackgroundColor3 = Library.MainColor;
         BorderSizePixel = 0;
@@ -2864,11 +2863,9 @@ function Library:Notify(Text, Time)
         ZIndex = 101;
         Parent = NotifyOuter;
     })
-
     Library:AddToRegistry(NotifyInner, {
         BackgroundColor3 = 'MainColor';
     }, true)
-
     local InnerFrame = Library:Create('Frame', {
         BackgroundColor3 = Color3.new(1, 1, 1);
         BorderSizePixel = 0;
@@ -2877,7 +2874,6 @@ function Library:Notify(Text, Time)
         ZIndex = 102;
         Parent = NotifyInner;
     })
-
     local Gradient = Library:Create('UIGradient', {
         Color = ColorSequence.new({
             ColorSequenceKeypoint.new(0, Library:GetDarkerColor(Library.MainColor));
@@ -2886,7 +2882,6 @@ function Library:Notify(Text, Time)
         Rotation = -90;
         Parent = InnerFrame;
     })
-
     Library:AddToRegistry(Gradient, {
         Color = function()
             return ColorSequence.new({
@@ -2895,13 +2890,23 @@ function Library:Notify(Text, Time)
             })
         end
     })
-
     local NotifyLabel = Library:CreateLabel({
         Position = UDim2.new(0, 8, 0, 0);
-        Size = UDim2.new(1, -10, 1, -4);
+        Size = UDim2.new(1, -timerWidth - 10, 1, -4);
         Text = Text;
         TextXAlignment = Enum.TextXAlignment.Left;
         TextSize = 13;
+        ZIndex = 103;
+        Parent = InnerFrame;
+    })
+
+    local TimerLabel = Library:CreateLabel({
+        Position = UDim2.new(1, -timerWidth - 4, 0, 0);
+        Size = UDim2.new(0, timerWidth, 1, -4);
+        Text = string.format('%.1fs', Time);
+        TextXAlignment = Enum.TextXAlignment.Right;
+        TextSize = 11;
+        TextTransparency = 0.35;
         ZIndex = 103;
         Parent = InnerFrame;
     })
@@ -2911,11 +2916,10 @@ function Library:Notify(Text, Time)
         BackgroundTransparency = 0.65;
         BorderSizePixel = 0;
         Position = UDim2.new(0, 3, 1, -3);
-        Size = UDim2.new(1, -3, 0, 2);
+        Size = UDim2.new(0, totalWidth - 3, 0, 2);
         ZIndex = 105;
         Parent = NotifyOuter;
     })
-
     local ProgressFill = Library:Create('Frame', {
         BackgroundColor3 = Library.AccentColor;
         BorderSizePixel = 0;
@@ -2923,7 +2927,6 @@ function Library:Notify(Text, Time)
         ZIndex = 106;
         Parent = ProgressBg;
     })
-
     Library:AddToRegistry(ProgressFill, {
         BackgroundColor3 = 'AccentColor';
     }, true)
@@ -2933,18 +2936,28 @@ function Library:Notify(Text, Time)
         'Out', 'Quart', 0.35, true)
 
     task.spawn(function()
-        wait(2)
+        wait(0.35)
 
         pcall(ProgressFill.TweenSize, ProgressFill,
             UDim2.new(0, 0, 1, 0),
             'In', 'Linear', Time, true)
 
-        wait(Time)
+        local remaining = Time
+        while remaining > 0 do
+            wait(0.1)
+            remaining = math.max(0, remaining - 0.1)
+            pcall(function()
+                if remaining > 0 then
+                    TimerLabel.Text = string.format('%.1fs', remaining)
+                else
+                    TimerLabel.Text = ''
+                end
+            end)
+        end
 
         pcall(NotifyOuter.TweenSize, NotifyOuter,
             UDim2.new(0, 0, 0, YSize),
             'In', 'Quart', 0.3, true)
-
         wait(0.3)
         NotifyOuter:Destroy()
     end)
