@@ -2696,68 +2696,47 @@ do
     });
 
     local WatermarkOuter = Library:Create('Frame', {
-        BorderColor3 = Color3.new(0, 0, 0);
-        Position = UDim2.new(0, 100, 0, -25);
-        Size = UDim2.new(0, 213, 0, 20);
+        AnchorPoint = Vector2.new(0.5, 0);
+        BackgroundTransparency = 1;
+        BorderSizePixel = 0;
+        Position = UDim2.new(0.5, 0, 0, 6);
+        Size = UDim2.new(0, 200, 0, 22);
         ZIndex = 200;
         Visible = false;
         Parent = ScreenGui;
     });
 
-    local WatermarkInner = Library:Create('Frame', {
-        BackgroundColor3 = Library.MainColor;
-        BorderColor3 = Library.AccentColor;
-        BorderMode = Enum.BorderMode.Inset;
-        Size = UDim2.new(1, 0, 1, 0);
+    local WatermarkLabel = Library:CreateLabel({
+        AnchorPoint = Vector2.new(0.5, 0);
+        Position = UDim2.new(0.5, 0, 0, 0);
+        Size = UDim2.new(1, 0, 0, 16);
+        TextSize = 13;
+        TextXAlignment = Enum.TextXAlignment.Center;
         ZIndex = 201;
         Parent = WatermarkOuter;
     });
 
-    Library:AddToRegistry(WatermarkInner, {
-        BorderColor3 = 'AccentColor';
-    });
-
-    local InnerFrame = Library:Create('Frame', {
-        BackgroundColor3 = Color3.new(1, 1, 1);
+    local WatermarkLine = Library:Create('Frame', {
+        AnchorPoint = Vector2.new(0.5, 0);
+        BackgroundColor3 = Library.AccentColor;
         BorderSizePixel = 0;
-        Position = UDim2.new(0, 1, 0, 1);
-        Size = UDim2.new(1, -2, 1, -2);
-        ZIndex = 202;
-        Parent = WatermarkInner;
+        Position = UDim2.new(0.5, 0, 1, 2);
+        Size = UDim2.new(0.6, 0, 0, 1);
+        ZIndex = 201;
+        Parent = WatermarkOuter;
     });
 
-    local Gradient = Library:Create('UIGradient', {
-        Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0, Library:GetDarkerColor(Library.MainColor)),
-            ColorSequenceKeypoint.new(1, Library.MainColor),
-        });
-        Rotation = -90;
-        Parent = InnerFrame;
+    Library:AddToRegistry(WatermarkLabel, {
+        TextColor3 = 'FontColor';
     });
 
-    Library:AddToRegistry(Gradient, {
-        Color = function()
-            return ColorSequence.new({
-                ColorSequenceKeypoint.new(0, Library:GetDarkerColor(Library.MainColor)),
-                ColorSequenceKeypoint.new(1, Library.MainColor),
-            });
-        end
-    });
-
-    local WatermarkLabel = Library:CreateLabel({
-        Position = UDim2.new(0, 5, 0, 0);
-        Size = UDim2.new(1, -4, 1, 0);
-        TextSize = 14;
-        TextXAlignment = Enum.TextXAlignment.Left;
-        ZIndex = 203;
-        Parent = InnerFrame;
+    Library:AddToRegistry(WatermarkLine, {
+        BackgroundColor3 = 'AccentColor';
     });
 
     Library.Watermark = WatermarkOuter;
     Library.WatermarkText = WatermarkLabel;
     Library:MakeDraggable(Library.Watermark);
-
-
 
     local KeybindOuter = Library:Create('Frame', {
         AnchorPoint = Vector2.new(0, 0.5);
@@ -2834,11 +2813,15 @@ function Library:SetWatermarkVisibility(Bool)
 end;
 
 function Library:SetWatermark(Text)
-    local X, Y = Library:GetTextBounds(Text, Library.Font, 14);
-    Library.Watermark.Size = UDim2.new(0, X + 15, 0, (Y * 1.5) + 3);
-    Library:SetWatermarkVisibility(true)
+    local X = Library:GetTextBounds(Text, Library.Font, 13);
+    local TotalWidth = X + 20;
 
+    Library.Watermark.Size = UDim2.new(0, TotalWidth, 0, 22);
     Library.WatermarkText.Text = Text;
+
+    WatermarkLine.Size = UDim2.new(0, math.floor(TotalWidth * 0.55), 0, 1);
+
+    Library:SetWatermarkVisibility(true);
 end;
 
 function Library:Notify(Text, Time)
