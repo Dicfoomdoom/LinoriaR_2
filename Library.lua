@@ -32,7 +32,7 @@ local Library = {
     FontColor = Color3.fromRGB(255, 255, 255);
     MainColor = Color3.fromRGB(12, 12, 12);
     BackgroundColor = Color3.fromRGB(8, 8, 8);
-    AccentColor = Color3.fromRGB(15, 15, 107);
+    AccentColor = Color3.fromRGB(11, 11, 60);
     OutlineColor = Color3.fromRGB(12, 12, 12);
     RiskColor = Color3.fromRGB(255, 50, 50),
 
@@ -2698,6 +2698,7 @@ do
     local WatermarkOuter = Library:Create('Frame', {
         AnchorPoint = Vector2.new(0.5, 0);
         BackgroundTransparency = 0;
+        BackgroundColor3 = Library.Background;
         BorderSizePixel = 0;
         Position = UDim2.new(0.5, 0, 0, 6);
         Size = UDim2.new(0, 200, 0, 22);
