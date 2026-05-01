@@ -2826,6 +2826,7 @@ function Library:SetWatermark(Text)
 end;
 
 function Library:Notify(Text, Time)
+    Time = tonumber(Time) or 5
     local XSize, YSize = Library:GetTextBounds(Text, Library.Font, 13)
     YSize = YSize + 14
     local timerWidth = 28
@@ -2887,7 +2888,7 @@ function Library:Notify(Text, Time)
     local TimerLabel = Library:CreateLabel({
         Position = UDim2.new(1, -timerWidth - 4, 0, 0);
         Size = UDim2.new(0, timerWidth, 1, -4);
-        Text = string.format('%.1fs', tonumber(Time) or 0);
+        Text = string.format('%.1fs', Time);
         TextXAlignment = Enum.TextXAlignment.Right;
         TextSize = 11;
         TextTransparency = 0.35;
