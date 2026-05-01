@@ -2887,7 +2887,7 @@ function Library:Notify(Text, Time)
     local TimerLabel = Library:CreateLabel({
         Position = UDim2.new(1, -timerWidth - 4, 0, 0);
         Size = UDim2.new(0, timerWidth, 1, -4);
-        Text = string.format('%.1fs', Time);
+        Text = string.format('%.1fs', tonumber(Time) or 0);
         TextXAlignment = Enum.TextXAlignment.Right;
         TextSize = 11;
         TextTransparency = 0.35;
