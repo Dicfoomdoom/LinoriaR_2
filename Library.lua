@@ -77,16 +77,16 @@ local Library = {
 
     HudRegistry = {};
 
-    FontColor = Color3.fromRGB(255, 255, 255);
-    MainColor = Color3.fromRGB(12, 12, 12);
-    BackgroundColor = Color3.fromRGB(8, 8, 8);
-    AccentColor = Color3.fromRGB(25, 25, 60);
-    OutlineColor = Color3.fromRGB(12, 12, 12);
+    FontColor = Color3.fromRGB(212, 200, 255);
+    MainColor = Color3.fromRGB(13, 11, 24);
+    BackgroundColor = Color3.fromRGB(10, 10, 15);
+    AccentColor = Color3.fromRGB(124, 58, 237);
+    OutlineColor = Color3.fromRGB(42, 31, 74);
     RiskColor = Color3.fromRGB(255, 50, 50),
 
     Black = Color3.new(0, 0, 0);
     Font = Enum.Font.Code,
-    CustomFontFace = CustomFontFace; -- nil если не загрузился
+    CustomFontFace = CustomFontFace;
 
     OpenedFrames = {};
     DependencyBoxes = {};
