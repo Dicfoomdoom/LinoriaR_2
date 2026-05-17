@@ -3747,9 +3747,13 @@ function Library:CreateWindow(...)
     end))
 
     local function UpdatePanelPosition()
-        if panelIsDragging then return end
-        local absPos  = Outer.AbsolutePosition
+        if panelIsDragging then
+            return
+        end
+
+        local absPos = Outer.AbsolutePosition
         local absSize = Outer.AbsoluteSize
+
         PanelOuter.Position = UDim2.fromOffset(
             absPos.X + absSize.X + 6,
             absPos.Y
@@ -3765,67 +3769,114 @@ function Library:CreateWindow(...)
 
     PanelOuter.Visible = Outer.Visible
 
+    local TransparencyCache = {}
+
+    local function GetProps(Object)
+        local Props = {}
+
+        if Object:IsA('ImageLabel') then
+            table.insert(Props, 'ImageTransparency')
+            table.insert(Props, 'BackgroundTransparency')
+
+        elseif Object:IsA('TextLabel') then
+            table.insert(Props, 'TextTransparency')
+
+        elseif Object:IsA('Frame') or Object:IsA('ScrollingFrame') then
+            table.insert(Props, 'BackgroundTransparency')
+
+        elseif Object:IsA('UIStroke') then
+            table.insert(Props, 'Transparency')
+        end
+
+        return Props
+    end
+
     Outer:GetPropertyChangedSignal('Visible'):Connect(function()
         local targetVisible = Outer.Visible
         local FadeTime = Config.MenuFadeTime
 
-        if targetVisible then
-            PanelOuter.Visible = true
-        end
-
         local descendants = { PanelOuter }
+
         for _, d in next, PanelOuter:GetDescendants() do
             table.insert(descendants, d)
         end
 
-        for _, Desc in next, descendants do
-            local props = {}
+        if targetVisible then
+            PanelOuter.Visible = true
 
-            if Desc:IsA('ImageLabel') then
-                table.insert(props, 'ImageTransparency')
-                table.insert(props, 'BackgroundTransparency')
-            elseif Desc:IsA('TextLabel') then
-                table.insert(props, 'TextTransparency')
-            elseif Desc:IsA('Frame') or Desc:IsA('ScrollingFrame') then
-                table.insert(props, 'BackgroundTransparency')
-            elseif Desc:IsA('UIStroke') then
-                table.insert(props, 'Transparency')
+            for _, Desc in next, descendants do
+                local props = GetProps(Desc)
+
+                for _, prop in next, props do
+                    TransparencyCache[Desc] = TransparencyCache[Desc] or {}
+
+                    if TransparencyCache[Desc][prop] == nil then
+                        TransparencyCache[Desc][prop] = Desc[prop]
+                    end
+
+                    Desc[prop] = 1
+                end
             end
+        end
+
+        for _, Desc in next, descendants do
+            local props = GetProps(Desc)
 
             for _, prop in next, props do
-                local current = Desc[prop]
-                if current == 1 then continue end
+                TransparencyCache[Desc] = TransparencyCache[Desc] or {}
+
+                if TransparencyCache[Desc][prop] == nil then
+                    TransparencyCache[Desc][prop] = Desc[prop]
+                end
+
+                local target = targetVisible
+                    and TransparencyCache[Desc][prop]
+                    or 1
 
                 TweenService:Create(
                     Desc,
                     TweenInfo.new(FadeTime, Enum.EasingStyle.Linear),
-                    { [prop] = targetVisible and current or 1 }
+                    {
+                        [prop] = target
+                    }
                 ):Play()
             end
         end
 
         if not targetVisible then
             task.delay(FadeTime, function()
-                PanelOuter.Visible = false
+                if not Outer.Visible then
+                    PanelOuter.Visible = false
+                end
             end)
         end
     end)
 
     Library:GiveSignal(RunService.Heartbeat:Connect(function()
         local t = os.date('*t')
-        TimeLabel.Text = string.format('%02d:%02d:%02d', t.hour, t.min, t.sec)
+
+        TimeLabel.Text = string.format(
+            '%02d:%02d:%02d',
+            t.hour,
+            t.min,
+            t.sec
+        )
+
         PlayersLabel.Text = 'Players: ' .. #Players:GetPlayers()
         FpsLabel.Text = 'FPS: ' .. currentFps
 
         local stats = game:GetService('Stats')
-        local ping = math.floor(stats.Network.ServerStatsItem['Data Ping']:GetValue())
+        local ping = math.floor(
+            stats.Network.ServerStatsItem['Data Ping']:GetValue()
+        )
+
         PingLabel.Text = 'Ping: ' .. ping .. 'ms'
     end))
 
     Window.InfoPanel = {}
     Window.InfoPanelFrame = PanelOuter
 end
-
+    
     Window.Holder = Outer;
 
     return Window;
