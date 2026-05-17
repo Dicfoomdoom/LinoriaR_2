@@ -3753,7 +3753,7 @@ function Library:CreateWindow(...)
 
     -- Позиция справа сверху от окна
     local function UpdatePanelPosition()
-        if PanelOuter._IsDragging then return end
+        if panelIsDragging then return end
         local absPos  = Outer.AbsolutePosition
         local absSize = Outer.AbsoluteSize
         PanelOuter.Position = UDim2.fromOffset(
@@ -3810,7 +3810,7 @@ function Library:CreateWindow(...)
     end)
 
     Outer:GetPropertyChangedSignal('AbsolutePosition'):Connect(function()
-        if not PanelOuter._IsDragging then
+        if not panelIsDragging then
             UpdatePanelPosition()
         end
     end)
