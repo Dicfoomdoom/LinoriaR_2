@@ -3596,164 +3596,290 @@ function Library:CreateWindow(...)
 
     if Config.AutoShow then task.spawn(Library.Toggle) end
 
-    -- ══════════════════════════════════════════════
-    --   InfoPanel — panel to the right of the window
-    -- ══════════════════════════════════════════════
     do
-        local PANEL_W = 152
-        local PANEL_H = 122
+    local PANEL_W = 152
+    local PANEL_H = 148
 
-        local PanelOuter = Library:Create('Frame', {
-            BackgroundColor3 = Color3.new(0, 0, 0);
-            BorderSizePixel = 0;
-            Size = UDim2.fromOffset(PANEL_W, PANEL_H);
-            ZIndex = 1;
-            Visible = false;
-            Parent = ScreenGui;
-        });
+    local PanelOuter = Library:Create('Frame', {
+        BackgroundColor3 = Color3.new(0, 0, 0);
+        BorderSizePixel = 0;
+        Size = UDim2.fromOffset(PANEL_W, PANEL_H);
+        ZIndex = 1;
+        Visible = false;
+        Parent = ScreenGui;
+    });
 
-        local PanelInner = Library:Create('Frame', {
-            BackgroundColor3 = Library.MainColor;
-            BorderColor3 = Library.AccentColor;
-            BorderMode = Enum.BorderMode.Inset;
-            Position = UDim2.new(0, 1, 0, 1);
-            Size = UDim2.new(1, -2, 1, -2);
-            ZIndex = 1;
-            Parent = PanelOuter;
-        });
+    local PanelInner = Library:Create('Frame', {
+        BackgroundColor3 = Library.MainColor;
+        BorderColor3 = Library.AccentColor;
+        BorderMode = Enum.BorderMode.Inset;
+        Position = UDim2.new(0, 1, 0, 1);
+        Size = UDim2.new(1, -2, 1, -2);
+        ZIndex = 1;
+        Parent = PanelOuter;
+    });
 
-        Library:AddToRegistry(PanelInner, {
-            BackgroundColor3 = 'MainColor';
-            BorderColor3 = 'AccentColor';
-        });
+    Library:AddToRegistry(PanelInner, {
+        BackgroundColor3 = 'MainColor';
+        BorderColor3 = 'AccentColor';
+    });
 
-        local PanelBg = Library:Create('Frame', {
-            BackgroundColor3 = Library.BackgroundColor;
-            BorderColor3 = Library.OutlineColor;
-            Position = UDim2.new(0, 4, 0, 4);
-            Size = UDim2.new(1, -8, 1, -8);
-            ZIndex = 2;
-            Parent = PanelInner;
-        });
+    local PanelBg = Library:Create('Frame', {
+        BackgroundColor3 = Library.BackgroundColor;
+        BorderColor3 = Library.OutlineColor;
+        Position = UDim2.new(0, 4, 0, 4);
+        Size = UDim2.new(1, -8, 1, -8);
+        ZIndex = 2;
+        Parent = PanelInner;
+    });
 
-        Library:AddToRegistry(PanelBg, {
-            BackgroundColor3 = 'BackgroundColor';
-            BorderColor3 = 'OutlineColor';
-        });
+    Library:AddToRegistry(PanelBg, {
+        BackgroundColor3 = 'BackgroundColor';
+        BorderColor3 = 'OutlineColor';
+    });
 
-        local PanelAccentLine = Library:Create('Frame', {
-            BackgroundColor3 = Library.AccentColor;
-            BorderSizePixel = 0;
-            Size = UDim2.new(1, 0, 0, 2);
-            ZIndex = 3;
-            Parent = PanelBg;
-        });
+    local PanelAccentLine = Library:Create('Frame', {
+        BackgroundColor3 = Library.AccentColor;
+        BorderSizePixel = 0;
+        Size = UDim2.new(1, 0, 0, 2);
+        ZIndex = 3;
+        Parent = PanelBg;
+    });
 
-        Library:AddToRegistry(PanelAccentLine, {
-            BackgroundColor3 = 'AccentColor';
-        });
+    Library:AddToRegistry(PanelAccentLine, {
+        BackgroundColor3 = 'AccentColor';
+    });
 
-        -- Player name
-        local NickLabel = Library:CreateLabel({
-            Position = UDim2.new(0, 0, 0, 4);
-            Size = UDim2.new(1, 0, 0, 14);
-            TextSize = 12;
-            Text = LocalPlayer.Name;
-            TextXAlignment = Enum.TextXAlignment.Center;
-            ZIndex = 4;
-            Parent = PanelBg;
-        });
+    -- Player name
+    local NickLabel = Library:CreateLabel({
+        Position = UDim2.new(0, 0, 0, 4);
+        Size = UDim2.new(1, 0, 0, 14);
+        TextSize = 12;
+        Text = LocalPlayer.Name;
+        TextXAlignment = Enum.TextXAlignment.Center;
+        ZIndex = 4;
+        Parent = PanelBg;
+    });
 
-        -- Avatar outer border (black)
-        local AvatarOuter = Library:Create('Frame', {
-            AnchorPoint = Vector2.new(0.5, 0);
-            BackgroundColor3 = Color3.new(0, 0, 0);
-            BorderSizePixel = 0;
-            Position = UDim2.new(0.5, 0, 0, 21);
-            Size = UDim2.fromOffset(48, 48);
-            ZIndex = 3;
-            Parent = PanelBg;
-        });
+    -- Avatar outer border (black)
+    local AvatarOuter = Library:Create('Frame', {
+        AnchorPoint = Vector2.new(0.5, 0);
+        BackgroundColor3 = Color3.new(0, 0, 0);
+        BorderSizePixel = 0;
+        Position = UDim2.new(0.5, 0, 0, 21);
+        Size = UDim2.fromOffset(48, 48);
+        ZIndex = 3;
+        Parent = PanelBg;
+    });
 
-        -- Avatar accent border
-        local AvatarInner = Library:Create('Frame', {
-            BackgroundColor3 = Library.AccentColor;
-            BorderSizePixel = 0;
-            Position = UDim2.new(0, 1, 0, 1);
-            Size = UDim2.new(1, -2, 1, -2);
-            ZIndex = 4;
-            Parent = AvatarOuter;
-        });
+    local AvatarInner = Library:Create('Frame', {
+        BackgroundColor3 = Library.AccentColor;
+        BorderSizePixel = 0;
+        Position = UDim2.new(0, 1, 0, 1);
+        Size = UDim2.new(1, -2, 1, -2);
+        ZIndex = 4;
+        Parent = AvatarOuter;
+    });
 
-        Library:AddToRegistry(AvatarInner, {
-            BackgroundColor3 = 'AccentColor';
-        });
+    Library:AddToRegistry(AvatarInner, {
+        BackgroundColor3 = 'AccentColor';
+    });
 
-        local AvatarImage = Library:Create('ImageLabel', {
-            BackgroundTransparency = 1;
-            BorderSizePixel = 0;
-            Position = UDim2.new(0, 1, 0, 1);
-            Size = UDim2.new(1, -2, 1, -2);
-            Image = 'https://www.roblox.com/headshot-thumbnail/image?userId='
-                .. LocalPlayer.UserId
-                .. '&width=150&height=150&format=png';
-            ZIndex = 5;
-            Parent = AvatarInner;
-        });
+    local AvatarImage = Library:Create('ImageLabel', {
+        BackgroundTransparency = 1;
+        BorderSizePixel = 0;
+        Position = UDim2.new(0, 1, 0, 1);
+        Size = UDim2.new(1, -2, 1, -2);
+        Image = 'https://www.roblox.com/headshot-thumbnail/image?userId='
+            .. LocalPlayer.UserId
+            .. '&width=150&height=150&format=png';
+        ZIndex = 5;
+        Parent = AvatarInner;
+    });
 
-        -- avatar bottom = 21 + 48 = 69 px from PanelBg top
-        -- PanelBg inner height = PANEL_H - 2(border) - 8(top pad) - 8(bot pad) = 104 px
-        -- time at 72, players at 86 — fits within 104px
+    local TimeLabel = Library:CreateLabel({
+        Position = UDim2.new(0, 0, 0, 72);
+        Size = UDim2.new(1, 0, 0, 12);
+        TextSize = 11;
+        Text = '00:00:00';
+        TextXAlignment = Enum.TextXAlignment.Center;
+        ZIndex = 4;
+        Parent = PanelBg;
+    });
 
-        local TimeLabel = Library:CreateLabel({
-            Position = UDim2.new(0, 0, 0, 72);
-            Size = UDim2.new(1, 0, 0, 12);
-            TextSize = 11;
-            Text = '00:00:00';
-            TextXAlignment = Enum.TextXAlignment.Center;
-            ZIndex = 4;
-            Parent = PanelBg;
-        });
+    local PlayersLabel = Library:CreateLabel({
+        Position = UDim2.new(0, 0, 0, 86);
+        Size = UDim2.new(1, 0, 0, 12);
+        TextSize = 11;
+        Text = 'Players: ' .. #Players:GetPlayers();
+        TextXAlignment = Enum.TextXAlignment.Center;
+        ZIndex = 4;
+        Parent = PanelBg;
+    });
 
-        local PlayersLabel = Library:CreateLabel({
-            Position = UDim2.new(0, 0, 0, 86);
-            Size = UDim2.new(1, 0, 0, 12);
-            TextSize = 11;
-            Text = 'Players: ' .. #Players:GetPlayers();
-            TextXAlignment = Enum.TextXAlignment.Center;
-            ZIndex = 4;
-            Parent = PanelBg;
-        });
+    -- FPS label
+    local FpsLabel = Library:CreateLabel({
+        Position = UDim2.new(0, 0, 0, 100);
+        Size = UDim2.new(1, 0, 0, 12);
+        TextSize = 11;
+        Text = 'FPS: --';
+        TextXAlignment = Enum.TextXAlignment.Center;
+        ZIndex = 4;
+        Parent = PanelBg;
+    });
 
-        -- Use AbsolutePosition so dragging is tracked correctly
-        local function UpdatePanelPosition()
-            local absPos  = Outer.AbsolutePosition
-            local absSize = Outer.AbsoluteSize
-            PanelOuter.Position = UDim2.fromOffset(
-                absPos.X + absSize.X + 6,
-                absPos.Y
+    -- Ping label
+    local PingLabel = Library:CreateLabel({
+        Position = UDim2.new(0, 0, 0, 114);
+        Size = UDim2.new(1, 0, 0, 12);
+        TextSize = 11;
+        Text = 'Ping: --';
+        TextXAlignment = Enum.TextXAlignment.Center;
+        ZIndex = 4;
+        Parent = PanelBg;
+    });
+
+    -- FPS счётчик
+    local fpsCounter = 0
+    local fpsClock = 0
+    local currentFps = 0
+
+    Library:GiveSignal(RunService.RenderStepped:Connect(function(delta)
+        fpsCounter = fpsCounter + 1
+        fpsClock = fpsClock + delta
+
+        if fpsClock >= 0.5 then
+            currentFps = math.floor(fpsCounter / fpsClock)
+            fpsCounter = 0
+            fpsClock = 0
+        end
+    end))
+
+    -- Позиция справа сверху от окна
+    local function UpdatePanelPosition()
+        if PanelOuter._IsDragging then return end
+        local absPos  = Outer.AbsolutePosition
+        local absSize = Outer.AbsoluteSize
+        PanelOuter.Position = UDim2.fromOffset(
+            absPos.X + absSize.X + 6,
+            absPos.Y
+        )
+    end
+
+    -- Dragging панели отдельно от окна
+    local panelDragging = false
+    local panelDragStart = nil
+    local panelPosStart = nil
+
+    PanelOuter.InputBegan:Connect(function(Input)
+        if Input.UserInputType == Enum.UserInputType.MouseButton1 then
+            panelDragging = true
+            PanelOuter._IsDragging = true
+            panelDragStart = Vector2.new(Input.Position.X, Input.Position.Y)
+            panelPosStart = Vector2.new(
+                PanelOuter.Position.X.Offset,
+                PanelOuter.Position.Y.Offset
             )
         end
+    end)
 
-        Outer:GetPropertyChangedSignal('AbsolutePosition'):Connect(UpdatePanelPosition)
-        RunService.Heartbeat:Wait() -- let engine populate AbsolutePosition first
-        task.spawn(UpdatePanelPosition)
+    Library:GiveSignal(InputService.InputChanged:Connect(function(Input)
+        if panelDragging and Input.UserInputType == Enum.UserInputType.MouseMovement then
+            local delta = Vector2.new(Input.Position.X, Input.Position.Y) - panelDragStart
+            PanelOuter.Position = UDim2.fromOffset(
+                panelPosStart.X + delta.X,
+                panelPosStart.Y + delta.Y
+            )
+        end
+    end))
 
-        -- Show/hide in sync with the main window
-        Outer:GetPropertyChangedSignal('Visible'):Connect(function()
-            PanelOuter.Visible = Outer.Visible
-        end)
+    Library:GiveSignal(InputService.InputEnded:Connect(function(Input)
+        if Input.UserInputType == Enum.UserInputType.MouseButton1 then
+            panelDragging = false
+        end
+    end))
 
-        -- Clock uses os.date for correct local time; players refreshed every frame
-        Library:GiveSignal(RunService.Heartbeat:Connect(function()
-            local t = os.date('*t')
-            TimeLabel.Text = string.format('%02d:%02d:%02d', t.hour, t.min, t.sec)
-            PlayersLabel.Text = 'Players: ' .. #Players:GetPlayers()
-        end))
+    -- Snap обратно к окну при двойном клике
+    PanelOuter.InputBegan:Connect(function(Input)
+        if Input.UserInputType == Enum.UserInputType.MouseButton2 then
+            PanelOuter._IsDragging = false
+            UpdatePanelPosition()
+        end
+    end)
 
-        Window.InfoPanel = {}
-        Window.InfoPanelFrame = PanelOuter
-    end
+    Outer:GetPropertyChangedSignal('AbsolutePosition'):Connect(function()
+        if not PanelOuter._IsDragging then
+            UpdatePanelPosition()
+        end
+    end)
+
+    RunService.Heartbeat:Wait()
+    task.spawn(UpdatePanelPosition)
+
+    -- Синхронизация видимости с анимацией fade
+    PanelOuter.Visible = Outer.Visible
+
+    Outer:GetPropertyChangedSignal('Visible'):Connect(function()
+        local targetVisible = Outer.Visible
+        local FadeTime = Config.MenuFadeTime
+
+        if targetVisible then
+            PanelOuter.Visible = true
+        end
+
+        local descendants = { PanelOuter }
+        for _, d in next, PanelOuter:GetDescendants() do
+            table.insert(descendants, d)
+        end
+
+        for _, Desc in next, descendants do
+            local props = {}
+
+            if Desc:IsA('ImageLabel') then
+                table.insert(props, 'ImageTransparency')
+                table.insert(props, 'BackgroundTransparency')
+            elseif Desc:IsA('TextLabel') then
+                table.insert(props, 'TextTransparency')
+            elseif Desc:IsA('Frame') or Desc:IsA('ScrollingFrame') then
+                table.insert(props, 'BackgroundTransparency')
+            elseif Desc:IsA('UIStroke') then
+                table.insert(props, 'Transparency')
+            end
+
+            for _, prop in next, props do
+                local current = Desc[prop]
+                if current == 1 then continue end
+
+                TweenService:Create(
+                    Desc,
+                    TweenInfo.new(FadeTime, Enum.EasingStyle.Linear),
+                    { [prop] = targetVisible and current or 1 }
+                ):Play()
+            end
+        end
+
+        if not targetVisible then
+            task.delay(FadeTime, function()
+                PanelOuter.Visible = false
+            end)
+        end
+    end)
+
+    -- Heartbeat: время / players / fps / ping
+    Library:GiveSignal(RunService.Heartbeat:Connect(function()
+        local t = os.date('*t')
+        TimeLabel.Text = string.format('%02d:%02d:%02d', t.hour, t.min, t.sec)
+        PlayersLabel.Text = 'Players: ' .. #Players:GetPlayers()
+        FpsLabel.Text = 'FPS: ' .. currentFps
+
+        local stats = game:GetService('Stats')
+        local ping = math.floor(stats.Network.ServerStatsItem['Data Ping']:GetValue())
+        PingLabel.Text = 'Ping: ' .. ping .. 'ms'
+    end))
+
+    Window.InfoPanel = {}
+    Window.InfoPanelFrame = PanelOuter
+end
 
     Window.Holder = Outer;
 
