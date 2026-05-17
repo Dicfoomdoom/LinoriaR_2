@@ -3762,7 +3762,7 @@ function Library:CreateWindow(...)
         )
     end
 
-    -- Dragging панели отдельно от окна
+    local panelIsDragging = false
     local panelDragging = false
     local panelDragStart = nil
     local panelPosStart = nil
@@ -3772,7 +3772,7 @@ function Library:CreateWindow(...)
     PanelOuter.InputBegan:Connect(function(Input)
         if Input.UserInputType == Enum.UserInputType.MouseButton1 then
             panelDragging = true
-            PanelOuter._IsDragging = true
+            panelIsDragging = true
             dragInput = Input
 
             panelDragStart = Input.Position
@@ -3798,13 +3798,13 @@ function Library:CreateWindow(...)
     Library:GiveSignal(InputService.InputEnded:Connect(function(Input)
         if Input.UserInputType == Enum.UserInputType.MouseButton1 then
             panelDragging = false
-            PanelOuter._IsDragging = false
+            panelIsDragging = false
         end
     end))
 
     PanelOuter.InputBegan:Connect(function(Input)
         if Input.UserInputType == Enum.UserInputType.MouseButton2 then
-            PanelOuter._IsDragging = false
+            panelIsDragging = false
             UpdatePanelPosition()
         end
     end)
