@@ -77,12 +77,12 @@ local Library = {
 
     HudRegistry = {};
 
-    FontColor = Color3.fromRGB(212, 200, 255);
-    MainColor = Color3.fromRGB(13, 11, 24);
-    BackgroundColor = Color3.fromRGB(10, 10, 15);
-    AccentColor = Color3.fromRGB(124, 58, 237);
-    OutlineColor = Color3.fromRGB(42, 31, 74);
-    RiskColor = Color3.fromRGB(255, 50, 50),
+    FontColor = Color3.fromRGB(220, 255, 220);
+    MainColor = Color3.fromRGB(12, 12, 12);
+    BackgroundColor = Color3.fromRGB(8, 8, 8);
+    AccentColor = Color3.fromRGB(95, 255, 95);
+    OutlineColor = Color3.fromRGB(35, 55, 35);
+    RiskColor = Color3.fromRGB(255, 50, 50);
 
     Black = Color3.new(0, 0, 0);
     Font = Enum.Font.Code,
@@ -192,9 +192,6 @@ function Library:ApplyTextStroke(Inst)
     });
 end;
 
--- ══════════════════════════════════════════════
---   CreateLabel — применяем кастомный шрифт
--- ══════════════════════════════════════════════
 function Library:CreateLabel(Properties, IsHud)
     local _Instance = Library:Create('TextLabel', {
         BackgroundTransparency = 1;
@@ -204,7 +201,6 @@ function Library:CreateLabel(Properties, IsHud)
         TextStrokeTransparency = 0;
     });
 
-    -- Подставляем кастомный шрифт если загрузился
     if Library.CustomFontFace then
         _Instance.FontFace = Library.CustomFontFace;
     end
@@ -3771,11 +3767,15 @@ function Library:CreateWindow(...)
     local panelDragStart = nil
     local panelPosStart = nil
 
+    local dragInput
+
     PanelOuter.InputBegan:Connect(function(Input)
         if Input.UserInputType == Enum.UserInputType.MouseButton1 then
             panelDragging = true
             PanelOuter._IsDragging = true
-            panelDragStart = Vector2.new(Input.Position.X, Input.Position.Y)
+            dragInput = Input
+
+            panelDragStart = Input.Position
             panelPosStart = Vector2.new(
                 PanelOuter.Position.X.Offset,
                 PanelOuter.Position.Y.Offset
@@ -3783,9 +3783,11 @@ function Library:CreateWindow(...)
         end
     end)
 
+
     Library:GiveSignal(InputService.InputChanged:Connect(function(Input)
-        if panelDragging and Input.UserInputType == Enum.UserInputType.MouseMovement then
-            local delta = Vector2.new(Input.Position.X, Input.Position.Y) - panelDragStart
+        if Input == dragInput and panelDragging then
+            local delta = Input.Position - panelDragStart
+
             PanelOuter.Position = UDim2.fromOffset(
                 panelPosStart.X + delta.X,
                 panelPosStart.Y + delta.Y
@@ -3796,10 +3798,10 @@ function Library:CreateWindow(...)
     Library:GiveSignal(InputService.InputEnded:Connect(function(Input)
         if Input.UserInputType == Enum.UserInputType.MouseButton1 then
             panelDragging = false
+            PanelOuter._IsDragging = false
         end
     end))
 
-    -- Snap обратно к окну при двойном клике
     PanelOuter.InputBegan:Connect(function(Input)
         if Input.UserInputType == Enum.UserInputType.MouseButton2 then
             PanelOuter._IsDragging = false
