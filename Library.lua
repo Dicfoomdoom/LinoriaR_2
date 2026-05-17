@@ -3646,7 +3646,6 @@ function Library:CreateWindow(...)
         BackgroundColor3 = 'AccentColor';
     });
 
-    -- Player name
     local NickLabel = Library:CreateLabel({
         Position = UDim2.new(0, 0, 0, 4);
         Size = UDim2.new(1, 0, 0, 14);
@@ -3657,7 +3656,6 @@ function Library:CreateWindow(...)
         Parent = PanelBg;
     });
 
-    -- Avatar outer border (black)
     local AvatarOuter = Library:Create('Frame', {
         AnchorPoint = Vector2.new(0.5, 0);
         BackgroundColor3 = Color3.new(0, 0, 0);
@@ -3713,7 +3711,6 @@ function Library:CreateWindow(...)
         Parent = PanelBg;
     });
 
-    -- FPS label
     local FpsLabel = Library:CreateLabel({
         Position = UDim2.new(0, 0, 0, 100);
         Size = UDim2.new(1, 0, 0, 12);
@@ -3724,7 +3721,6 @@ function Library:CreateWindow(...)
         Parent = PanelBg;
     });
 
-    -- Ping label
     local PingLabel = Library:CreateLabel({
         Position = UDim2.new(0, 0, 0, 114);
         Size = UDim2.new(1, 0, 0, 12);
@@ -3735,7 +3731,6 @@ function Library:CreateWindow(...)
         Parent = PanelBg;
     });
 
-    -- FPS счётчик
     local fpsCounter = 0
     local fpsClock = 0
     local currentFps = 0
@@ -3751,7 +3746,6 @@ function Library:CreateWindow(...)
         end
     end))
 
-    -- Позиция справа сверху от окна
     local function UpdatePanelPosition()
         if panelIsDragging then return end
         local absPos  = Outer.AbsolutePosition
@@ -3762,63 +3756,13 @@ function Library:CreateWindow(...)
         )
     end
 
-    local panelIsDragging = false
-    local panelDragging = false
-    local panelDragStart = nil
-    local panelPosStart = nil
-
-    local dragInput
-
-    PanelOuter.InputBegan:Connect(function(Input)
-        if Input.UserInputType == Enum.UserInputType.MouseButton1 then
-            panelDragging = true
-            panelIsDragging = true
-            dragInput = Input
-
-            panelDragStart = Input.Position
-            panelPosStart = Vector2.new(
-                PanelOuter.Position.X.Offset,
-                PanelOuter.Position.Y.Offset
-            )
-        end
-    end)
-
-
-    Library:GiveSignal(InputService.InputChanged:Connect(function(Input)
-        if Input == dragInput and panelDragging then
-            local delta = Input.Position - panelDragStart
-
-            PanelOuter.Position = UDim2.fromOffset(
-                panelPosStart.X + delta.X,
-                panelPosStart.Y + delta.Y
-            )
-        end
-    end))
-
-    Library:GiveSignal(InputService.InputEnded:Connect(function(Input)
-        if Input.UserInputType == Enum.UserInputType.MouseButton1 then
-            panelDragging = false
-            panelIsDragging = false
-        end
-    end))
-
-    PanelOuter.InputBegan:Connect(function(Input)
-        if Input.UserInputType == Enum.UserInputType.MouseButton2 then
-            panelIsDragging = false
-            UpdatePanelPosition()
-        end
-    end)
-
     Outer:GetPropertyChangedSignal('AbsolutePosition'):Connect(function()
-        if not panelIsDragging then
-            UpdatePanelPosition()
-        end
+        UpdatePanelPosition()
     end)
 
     RunService.Heartbeat:Wait()
     task.spawn(UpdatePanelPosition)
 
-    -- Синхронизация видимости с анимацией fade
     PanelOuter.Visible = Outer.Visible
 
     Outer:GetPropertyChangedSignal('Visible'):Connect(function()
@@ -3867,7 +3811,6 @@ function Library:CreateWindow(...)
         end
     end)
 
-    -- Heartbeat: время / players / fps / ping
     Library:GiveSignal(RunService.Heartbeat:Connect(function()
         local t = os.date('*t')
         TimeLabel.Text = string.format('%02d:%02d:%02d', t.hour, t.min, t.sec)
