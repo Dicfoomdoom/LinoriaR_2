@@ -3674,8 +3674,8 @@ end;
     if Config.AutoShow then task.spawn(Library.Toggle) end
 
     do
-    local PANEL_W = 152
-    local PANEL_H = 148
+    local PANEL_W = 168
+    local PANEL_H = 172
 
     local PanelOuter = Library:Create('Frame', {
         BackgroundColor3 = Color3.new(0, 0, 0);
@@ -3727,28 +3727,46 @@ end;
         BackgroundColor3 = 'AccentColor';
     });
 
+    -- разделитель под аватаром
+    local AvatarDivider = Library:Create('Frame', {
+        BackgroundColor3 = Library.OutlineColor;
+        BorderSizePixel = 0;
+        Position = UDim2.new(0, 0, 0, 88);
+        Size = UDim2.new(1, 0, 0, 1);
+        ZIndex = 3;
+        Parent = PanelBg;
+    });
+
+    Library:AddToRegistry(AvatarDivider, { BackgroundColor3 = 'OutlineColor' });
+
     local NickLabel = Library:CreateLabel({
-        Position = UDim2.new(0, 0, 0, 4);
-        Size = UDim2.new(1, 0, 0, 14);
-        TextSize = 12;
+        Position = UDim2.new(0, 0, 0, 5);
+        Size = UDim2.new(1, 0, 0, 16);
+        TextSize = 13;
+        TextColor3 = Library.AccentColor;
         Text = LocalPlayer.Name;
         TextXAlignment = Enum.TextXAlignment.Center;
         ZIndex = 4;
         Parent = PanelBg;
     });
 
+    Library:RemoveFromRegistry(NickLabel);
+    Library:AddToRegistry(NickLabel, { TextColor3 = 'AccentColor' });
+
     local AvatarOuter = Library:Create('Frame', {
         AnchorPoint = Vector2.new(0.5, 0);
-        BackgroundColor3 = Color3.new(0, 0, 0);
+        BackgroundColor3 = Library.AccentColor;
         BorderSizePixel = 0;
-        Position = UDim2.new(0.5, 0, 0, 21);
-        Size = UDim2.fromOffset(48, 48);
+        Position = UDim2.new(0.5, 0, 0, 24);
+        Size = UDim2.fromOffset(52, 52);
         ZIndex = 3;
         Parent = PanelBg;
     });
 
+    Library:AddToRegistry(AvatarOuter, { BackgroundColor3 = 'AccentColor' });
+
     local AvatarInner = Library:Create('Frame', {
-        BackgroundColor3 = Library.AccentColor;
+        BackgroundColor3 = Library.BackgroundColor;
         BorderSizePixel = 0;
         Position = UDim2.new(0, 1, 0, 1);
         Size = UDim2.new(1, -2, 1, -2);
@@ -3756,15 +3774,12 @@ end;
         Parent = AvatarOuter;
     });
 
-    Library:AddToRegistry(AvatarInner, {
-        BackgroundColor3 = 'AccentColor';
-    });
+    Library:AddToRegistry(AvatarInner, { BackgroundColor3 = 'BackgroundColor' });
 
     local AvatarImage = Library:Create('ImageLabel', {
         BackgroundTransparency = 1;
         BorderSizePixel = 0;
-        Position = UDim2.new(0, 1, 0, 1);
-        Size = UDim2.new(1, -2, 1, -2);
+        Size = UDim2.new(1, 0, 1, 0);
         Image = 'https://www.roblox.com/headshot-thumbnail/image?userId='
             .. LocalPlayer.UserId
             .. '&width=150&height=150&format=png';
@@ -3772,79 +3787,104 @@ end;
         Parent = AvatarInner;
     });
 
+    -- иконка + время
+    local TimeIcon = Library:Create('ImageLabel', {
+        BackgroundTransparency = 1;
+        Position = UDim2.new(0, 8, 0, 96);
+        Size = UDim2.fromOffset(12, 12);
+        Image = 'rbxassetid://7059186854';
+        ImageColor3 = Library.AccentColor;
+        ZIndex = 4;
+        Parent = PanelBg;
+    });
+
+    Library:AddToRegistry(TimeIcon, { ImageColor3 = 'AccentColor' });
+
     local TimeLabel = Library:CreateLabel({
-        Position = UDim2.new(0, 0, 0, 72);
-        Size = UDim2.new(1, 0, 0, 12);
-        TextSize = 11;
+        Position = UDim2.new(0, 24, 0, 95);
+        Size = UDim2.new(1, -28, 0, 14);
+        TextSize = 13;
         Text = '00:00:00';
-        TextXAlignment = Enum.TextXAlignment.Center;
+        TextXAlignment = Enum.TextXAlignment.Left;
         ZIndex = 4;
         Parent = PanelBg;
     });
 
     local PlayersLabel = Library:CreateLabel({
-        Position = UDim2.new(0, 0, 0, 86);
-        Size = UDim2.new(1, 0, 0, 12);
-        TextSize = 11;
+        Position = UDim2.new(0, 8, 0, 113);
+        Size = UDim2.new(1, -8, 0, 14);
+        TextSize = 13;
         Text = 'Players: ' .. #Players:GetPlayers();
-        TextXAlignment = Enum.TextXAlignment.Center;
+        TextXAlignment = Enum.TextXAlignment.Left;
         ZIndex = 4;
         Parent = PanelBg;
     });
 
     local FpsLabel = Library:CreateLabel({
-        Position = UDim2.new(0, 0, 0, 100);
-        Size = UDim2.new(1, 0, 0, 12);
-        TextSize = 11;
+        Position = UDim2.new(0, 8, 0, 131);
+        Size = UDim2.new(1, -8, 0, 14);
+        TextSize = 13;
         Text = 'FPS: --';
-        TextXAlignment = Enum.TextXAlignment.Center;
+        TextXAlignment = Enum.TextXAlignment.Left;
         ZIndex = 4;
         Parent = PanelBg;
     });
 
     local PingLabel = Library:CreateLabel({
-        Position = UDim2.new(0, 0, 0, 114);
-        Size = UDim2.new(1, 0, 0, 12);
-        TextSize = 11;
+        Position = UDim2.new(0, 8, 0, 149);
+        Size = UDim2.new(1, -8, 0, 14);
+        TextSize = 13;
         Text = 'Ping: --';
-        TextXAlignment = Enum.TextXAlignment.Center;
+        TextXAlignment = Enum.TextXAlignment.Left;
         ZIndex = 4;
         Parent = PanelBg;
     });
 
+    -- цветные значения справа
+    local function MakeValueLabel(yPos)
+        return Library:CreateLabel({
+            Position = UDim2.new(0, 0, 0, yPos);
+            Size = UDim2.new(1, -8, 0, 14);
+            TextSize = 13;
+            Text = '--';
+            TextXAlignment = Enum.TextXAlignment.Right;
+            TextColor3 = Library.AccentColor;
+            ZIndex = 5;
+            Parent = PanelBg;
+        });
+    end
+
+    local TimeValue   = MakeValueLabel(95);
+    local PlayersValue = MakeValueLabel(113);
+    local FpsValue    = MakeValueLabel(131);
+    local PingValue   = MakeValueLabel(149);
+
+    for _, lbl in next, { TimeValue, PlayersValue, FpsValue, PingValue } do
+        Library:RemoveFromRegistry(lbl);
+        Library:AddToRegistry(lbl, { TextColor3 = 'AccentColor' });
+    end
+
     local fpsCounter = 0
-    local fpsClock = 0
+    local fpsClock   = 0
     local currentFps = 0
 
     Library:GiveSignal(RunService.RenderStepped:Connect(function(delta)
         fpsCounter = fpsCounter + 1
-        fpsClock = fpsClock + delta
-
+        fpsClock   = fpsClock + delta
         if fpsClock >= 0.5 then
             currentFps = math.floor(fpsCounter / fpsClock)
             fpsCounter = 0
-            fpsClock = 0
+            fpsClock   = 0
         end
     end))
 
     local function UpdatePanelPosition()
-        if panelIsDragging then
-            return
-        end
-
-        local absPos = Outer.AbsolutePosition
+        local absPos  = Outer.AbsolutePosition
         local absSize = Outer.AbsoluteSize
-
-        PanelOuter.Position = UDim2.fromOffset(
-            absPos.X + absSize.X + 6,
-            absPos.Y
-        )
+        PanelOuter.Position = UDim2.fromOffset(absPos.X + absSize.X + 6, absPos.Y)
     end
 
-    Outer:GetPropertyChangedSignal('AbsolutePosition'):Connect(function()
-        UpdatePanelPosition()
-    end)
-
+    Outer:GetPropertyChangedSignal('AbsolutePosition'):Connect(UpdatePanelPosition)
     RunService.Heartbeat:Wait()
     task.spawn(UpdatePanelPosition)
 
@@ -3854,76 +3894,48 @@ end;
 
     local function GetProps(Object)
         local Props = {}
-
         if Object:IsA('ImageLabel') then
             table.insert(Props, 'ImageTransparency')
             table.insert(Props, 'BackgroundTransparency')
-
         elseif Object:IsA('TextLabel') then
             table.insert(Props, 'TextTransparency')
-
         elseif Object:IsA('Frame') or Object:IsA('ScrollingFrame') then
             table.insert(Props, 'BackgroundTransparency')
-
         elseif Object:IsA('UIStroke') then
             table.insert(Props, 'Transparency')
         end
-
         return Props
     end
 
     Outer:GetPropertyChangedSignal('Visible'):Connect(function()
         local targetVisible = Outer.Visible
         local FadeTime = Config.MenuFadeTime
-
         local descendants = { PanelOuter }
-
         for _, d in next, PanelOuter:GetDescendants() do
             table.insert(descendants, d)
         end
-
         if targetVisible then
             PanelOuter.Visible = true
-
             for _, Desc in next, descendants do
-                local props = GetProps(Desc)
-
-                for _, prop in next, props do
+                for _, prop in next, GetProps(Desc) do
                     TransparencyCache[Desc] = TransparencyCache[Desc] or {}
-
                     if TransparencyCache[Desc][prop] == nil then
                         TransparencyCache[Desc][prop] = Desc[prop]
                     end
-
                     Desc[prop] = 1
                 end
             end
         end
-
         for _, Desc in next, descendants do
-            local props = GetProps(Desc)
-
-            for _, prop in next, props do
+            for _, prop in next, GetProps(Desc) do
                 TransparencyCache[Desc] = TransparencyCache[Desc] or {}
-
                 if TransparencyCache[Desc][prop] == nil then
                     TransparencyCache[Desc][prop] = Desc[prop]
                 end
-
-                local target = targetVisible
-                    and TransparencyCache[Desc][prop]
-                    or 1
-
-                TweenService:Create(
-                    Desc,
-                    TweenInfo.new(FadeTime, Enum.EasingStyle.Linear),
-                    {
-                        [prop] = target
-                    }
-                ):Play()
+                local target = targetVisible and TransparencyCache[Desc][prop] or 1
+                TweenService:Create(Desc, TweenInfo.new(FadeTime, Enum.EasingStyle.Linear), { [prop] = target }):Play()
             end
         end
-
         if not targetVisible then
             task.delay(FadeTime, function()
                 if not Outer.Visible then
@@ -3935,23 +3947,19 @@ end;
 
     Library:GiveSignal(RunService.Heartbeat:Connect(function()
         local t = os.date('*t')
+        local timeStr = string.format('%02d:%02d:%02d', t.hour, t.min, t.sec)
+        local ping = math.floor(game:GetService('Stats').Network.ServerStatsItem['Data Ping']:GetValue())
+        local playerCount = #Players:GetPlayers()
 
-        TimeLabel.Text = string.format(
-            '%02d:%02d:%02d',
-            t.hour,
-            t.min,
-            t.sec
-        )
+        TimeLabel.Text    = 'Time'
+        PlayersLabel.Text = 'Players'
+        FpsLabel.Text     = 'FPS'
+        PingLabel.Text    = 'Ping'
 
-        PlayersLabel.Text = 'Players: ' .. #Players:GetPlayers()
-        FpsLabel.Text = 'FPS: ' .. currentFps
-
-        local stats = game:GetService('Stats')
-        local ping = math.floor(
-            stats.Network.ServerStatsItem['Data Ping']:GetValue()
-        )
-
-        PingLabel.Text = 'Ping: ' .. ping .. 'ms'
+        TimeValue.Text    = timeStr
+        PlayersValue.Text = tostring(playerCount)
+        FpsValue.Text     = tostring(currentFps)
+        PingValue.Text    = ping .. 'ms'
     end))
 
     Window.InfoPanel = {}
