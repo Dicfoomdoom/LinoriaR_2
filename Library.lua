@@ -2494,40 +2494,39 @@ do
         end;
 
         function Dropdown:OpenDropdown()
-            ListOuter.Visible = true;
-            Library.OpenedFrames[ListOuter] = true;
-            DropdownArrow.Rotation = 180;
+    local targetY = math.clamp(#Dropdown.Values * 20, 0, MAX_DROPDOWN_ITEMS * 20) + 1;
 
-            local targetY = ListOuter.Size.Y.Offset;
-            ListOuter.Size = UDim2.fromOffset(ListOuter.Size.X.Offset, 0);
-            ListInner.Position = UDim2.new(0, 0, 0, 0);
+    ListOuter.Size = UDim2.fromOffset(DropdownOuter.AbsoluteSize.X, 0);
+    ListOuter.Visible = true;
+    Library.OpenedFrames[ListOuter] = true;
 
-            TweenService:Create(ListOuter, TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
-                Size = UDim2.fromOffset(ListOuter.Size.X.Offset, targetY);
-            }):Play();
+    TweenService:Create(ListOuter, TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+        Size = UDim2.fromOffset(DropdownOuter.AbsoluteSize.X, targetY);
+    }):Play();
 
-            TweenService:Create(DropdownArrow, TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
-                Rotation = 180;
-            }):Play();
+    TweenService:Create(DropdownArrow, TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+        Rotation = 180;
+    }):Play();
+end;
+
+function Dropdown:CloseDropdown()
+    Library.OpenedFrames[ListOuter] = nil;
+
+    TweenService:Create(ListOuter, TweenInfo.new(0.15, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {
+        Size = UDim2.fromOffset(ListOuter.Size.X.Offset, 0);
+    }):Play();
+
+    TweenService:Create(DropdownArrow, TweenInfo.new(0.15, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {
+        Rotation = 0;
+    }):Play();
+
+    task.delay(0.15, function()
+        if not Library.OpenedFrames[ListOuter] then
+            ListOuter.Visible = false;
+            ListOuter.Size = UDim2.fromOffset(DropdownOuter.AbsoluteSize.X, 0);
         end;
-
-        function Dropdown:CloseDropdown()
-            Library.OpenedFrames[ListOuter] = nil;
-
-            TweenService:Create(ListOuter, TweenInfo.new(0.15, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {
-                Size = UDim2.fromOffset(ListOuter.Size.X.Offset, 0);
-            }):Play();
-
-            TweenService:Create(DropdownArrow, TweenInfo.new(0.15, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {
-                Rotation = 0;
-            }):Play();
-
-            task.delay(0.15, function()
-                if not Library.OpenedFrames[ListOuter] then
-                    ListOuter.Visible = false;
-                end;
-            end);
-        end;
+    end);
+end;
 
         function Dropdown:OnChanged(Func)
             Dropdown.Changed = Func;
