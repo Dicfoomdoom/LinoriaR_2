@@ -2244,6 +2244,7 @@ do
             Position = UDim2.new(1, -16, 0.5, 0);
             Size = UDim2.new(0, 12, 0, 12);
             Image = 'http://www.roblox.com/asset/?id=6282522798';
+            Rotation = 0;
             ZIndex = 8;
             Parent = DropdownInner;
         });
@@ -2273,6 +2274,7 @@ do
         local ListOuter = Library:Create('Frame', {
             BackgroundColor3 = Color3.new(0, 0, 0);
             BorderColor3 = Color3.new(0, 0, 0);
+            ClipsDescendants = true;
             ZIndex = 20;
             Visible = false;
             Parent = ScreenGui;
@@ -2495,12 +2497,36 @@ do
             ListOuter.Visible = true;
             Library.OpenedFrames[ListOuter] = true;
             DropdownArrow.Rotation = 180;
+
+            local targetY = ListOuter.Size.Y.Offset;
+            ListOuter.Size = UDim2.fromOffset(ListOuter.Size.X.Offset, 0);
+            ListInner.Position = UDim2.new(0, 0, 0, 0);
+
+            TweenService:Create(ListOuter, TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+                Size = UDim2.fromOffset(ListOuter.Size.X.Offset, targetY);
+            }):Play();
+
+            TweenService:Create(DropdownArrow, TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+                Rotation = 180;
+            }):Play();
         end;
 
         function Dropdown:CloseDropdown()
-            ListOuter.Visible = false;
             Library.OpenedFrames[ListOuter] = nil;
-            DropdownArrow.Rotation = 0;
+
+            TweenService:Create(ListOuter, TweenInfo.new(0.15, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {
+                Size = UDim2.fromOffset(ListOuter.Size.X.Offset, 0);
+            }):Play();
+
+            TweenService:Create(DropdownArrow, TweenInfo.new(0.15, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {
+                Rotation = 0;
+            }):Play();
+
+            task.delay(0.15, function()
+                if not Library.OpenedFrames[ListOuter] then
+                    ListOuter.Visible = false;
+                end;
+            end);
         end;
 
         function Dropdown:OnChanged(Func)
