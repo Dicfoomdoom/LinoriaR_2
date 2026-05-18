@@ -3699,7 +3699,7 @@ end;
 
     if Config.AutoShow then task.spawn(Library.Toggle) end
 
-    do
+do
     local PANEL_W = 168
     local PANEL_H = 172
 
@@ -3753,7 +3753,6 @@ end;
         BackgroundColor3 = 'AccentColor';
     });
 
-    -- разделитель под аватаром
     local AvatarDivider = Library:Create('Frame', {
         BackgroundColor3 = Library.OutlineColor;
         BorderSizePixel = 0;
@@ -3769,7 +3768,6 @@ end;
         Position = UDim2.new(0, 0, 0, 5);
         Size = UDim2.new(1, 0, 0, 16);
         TextSize = 13;
-        TextColor3 = Library.AccentColor;
         Text = LocalPlayer.Name;
         TextXAlignment = Enum.TextXAlignment.Center;
         ZIndex = 4;
@@ -3813,82 +3811,37 @@ end;
         Parent = AvatarInner;
     });
 
-    -- иконка + время
-    local TimeIcon = Library:Create('ImageLabel', {
-        BackgroundTransparency = 1;
-        Position = UDim2.new(0, 8, 0, 96);
-        Size = UDim2.fromOffset(12, 12);
-        Image = 'rbxassetid://7059186854';
-        ImageColor3 = Library.AccentColor;
-        ZIndex = 4;
-        Parent = PanelBg;
-    });
-
-    Library:AddToRegistry(TimeIcon, { ImageColor3 = 'AccentColor' });
-
-    local TimeLabel = Library:CreateLabel({
-        Position = UDim2.new(0, 24, 0, 95);
-        Size = UDim2.new(1, -28, 0, 14);
-        TextSize = 13;
-        Text = '00:00:00';
-        TextXAlignment = Enum.TextXAlignment.Left;
-        ZIndex = 4;
-        Parent = PanelBg;
-    });
-
-    local PlayersLabel = Library:CreateLabel({
-        Position = UDim2.new(0, 8, 0, 113);
-        Size = UDim2.new(1, -8, 0, 14);
-        TextSize = 13;
-        Text = 'Players: ' .. #Players:GetPlayers();
-        TextXAlignment = Enum.TextXAlignment.Left;
-        ZIndex = 4;
-        Parent = PanelBg;
-    });
-
-    local FpsLabel = Library:CreateLabel({
-        Position = UDim2.new(0, 8, 0, 131);
-        Size = UDim2.new(1, -8, 0, 14);
-        TextSize = 13;
-        Text = 'FPS: --';
-        TextXAlignment = Enum.TextXAlignment.Left;
-        ZIndex = 4;
-        Parent = PanelBg;
-    });
-
-    local PingLabel = Library:CreateLabel({
-        Position = UDim2.new(0, 8, 0, 149);
-        Size = UDim2.new(1, -8, 0, 14);
-        TextSize = 13;
-        Text = 'Ping: --';
-        TextXAlignment = Enum.TextXAlignment.Left;
-        ZIndex = 4;
-        Parent = PanelBg;
-    });
-
-    -- цветные значения справа
-    local function MakeValueLabel(yPos)
-        return Library:CreateLabel({
-            Position = UDim2.new(0, 0, 0, yPos);
-            Size = UDim2.new(1, -8, 0, 14);
-            TextSize = 13;
-            Text = '--';
-            TextXAlignment = Enum.TextXAlignment.Right;
-            TextColor3 = Library.AccentColor;
-            ZIndex = 5;
+    local function MakeRow(yPos, keyText)
+        local KeyLabel = Library:CreateLabel({
+            Position = UDim2.new(0, 8, 0, yPos);
+            Size = UDim2.new(0, 70, 0, 14);
+            TextSize = 12;
+            Text = keyText;
+            TextXAlignment = Enum.TextXAlignment.Left;
+            ZIndex = 4;
             Parent = PanelBg;
         });
+
+        local ValLabel = Library:CreateLabel({
+            Position = UDim2.new(0, 78, 0, yPos);
+            Size = UDim2.new(1, -86, 0, 14);
+            TextSize = 12;
+            Text = '--';
+            TextXAlignment = Enum.TextXAlignment.Right;
+            ZIndex = 4;
+            Parent = PanelBg;
+        });
+
+        Library:RemoveFromRegistry(ValLabel);
+        Library:AddToRegistry(ValLabel, { TextColor3 = 'AccentColor' });
+
+        return ValLabel;
     end
 
-    local TimeValue   = MakeValueLabel(95);
-    local PlayersValue = MakeValueLabel(113);
-    local FpsValue    = MakeValueLabel(131);
-    local PingValue   = MakeValueLabel(149);
-
-    for _, lbl in next, { TimeValue, PlayersValue, FpsValue, PingValue } do
-        Library:RemoveFromRegistry(lbl);
-        Library:AddToRegistry(lbl, { TextColor3 = 'AccentColor' });
-    end
+    local TimeValue    = MakeRow(96,  'Time');
+    local PlayersValue = MakeRow(113, 'Players');
+    local FpsValue     = MakeRow(130, 'FPS');
+    local PingValue    = MakeRow(147, 'Ping');
 
     local fpsCounter = 0
     local fpsClock   = 0
@@ -3907,7 +3860,10 @@ end;
     local function UpdatePanelPosition()
         local absPos  = Outer.AbsolutePosition
         local absSize = Outer.AbsoluteSize
-        PanelOuter.Position = UDim2.fromOffset(absPos.X + absSize.X + 6, absPos.Y)
+        PanelOuter.Position = UDim2.fromOffset(
+            absPos.X + absSize.X + 6,
+            absPos.Y
+        )
     end
 
     Outer:GetPropertyChangedSignal('AbsolutePosition'):Connect(UpdatePanelPosition)
@@ -3937,9 +3893,11 @@ end;
         local targetVisible = Outer.Visible
         local FadeTime = Config.MenuFadeTime
         local descendants = { PanelOuter }
+
         for _, d in next, PanelOuter:GetDescendants() do
             table.insert(descendants, d)
         end
+
         if targetVisible then
             PanelOuter.Visible = true
             for _, Desc in next, descendants do
@@ -3952,16 +3910,24 @@ end;
                 end
             end
         end
+
         for _, Desc in next, descendants do
             for _, prop in next, GetProps(Desc) do
                 TransparencyCache[Desc] = TransparencyCache[Desc] or {}
                 if TransparencyCache[Desc][prop] == nil then
                     TransparencyCache[Desc][prop] = Desc[prop]
                 end
-                local target = targetVisible and TransparencyCache[Desc][prop] or 1
-                TweenService:Create(Desc, TweenInfo.new(FadeTime, Enum.EasingStyle.Linear), { [prop] = target }):Play()
+                local target = targetVisible
+                    and TransparencyCache[Desc][prop]
+                    or 1
+                TweenService:Create(
+                    Desc,
+                    TweenInfo.new(FadeTime, Enum.EasingStyle.Linear),
+                    { [prop] = target }
+                ):Play()
             end
         end
+
         if not targetVisible then
             task.delay(FadeTime, function()
                 if not Outer.Visible then
@@ -3972,18 +3938,13 @@ end;
     end)
 
     Library:GiveSignal(RunService.Heartbeat:Connect(function()
-        local t = os.date('*t')
-        local timeStr = string.format('%02d:%02d:%02d', t.hour, t.min, t.sec)
-        local ping = math.floor(game:GetService('Stats').Network.ServerStatsItem['Data Ping']:GetValue())
-        local playerCount = #Players:GetPlayers()
+        local t    = os.date('*t')
+        local ping = math.floor(
+            game:GetService('Stats').Network.ServerStatsItem['Data Ping']:GetValue()
+        )
 
-        TimeLabel.Text    = 'Time'
-        PlayersLabel.Text = 'Players'
-        FpsLabel.Text     = 'FPS'
-        PingLabel.Text    = 'Ping'
-
-        TimeValue.Text    = timeStr
-        PlayersValue.Text = tostring(playerCount)
+        TimeValue.Text    = string.format('%02d:%02d:%02d', t.hour, t.min, t.sec)
+        PlayersValue.Text = tostring(#Players:GetPlayers())
         FpsValue.Text     = tostring(currentFps)
         PingValue.Text    = ping .. 'ms'
     end))
