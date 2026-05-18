@@ -77,12 +77,12 @@ local Library = {
 
     HudRegistry = {};
 
-    FontColor = Color3.fromRGB(220, 255, 220);
-    MainColor = Color3.fromRGB(12, 12, 12);
-    BackgroundColor = Color3.fromRGB(8, 8, 8);
-    AccentColor = Color3.fromRGB(95, 255, 95);
-    OutlineColor = Color3.fromRGB(35, 55, 35);
-    RiskColor = Color3.fromRGB(255, 50, 50);
+    FontColor       = Color3.fromRGB(200, 200, 200);
+    MainColor       = Color3.fromRGB(10,  10,  12);
+    BackgroundColor = Color3.fromRGB(4,   4,   6);
+    AccentColor     = Color3.fromRGB(28,  78, 170);
+    OutlineColor    = Color3.fromRGB(22,  22,  30);
+    RiskColor       = Color3.fromRGB(255, 50,  50);
 
     Black = Color3.new(0, 0, 0);
     Font = Enum.Font.Code,
@@ -3182,22 +3182,51 @@ function Library:CreateWindow(...)
         end;
 
         function Tab:ShowTab()
-            for _, Tab in next, Window.Tabs do
-                Tab:HideTab();
-            end;
+    for _, Tab in next, Window.Tabs do
+        Tab:HideTab();
+    end;
 
-            Blocker.BackgroundTransparency = 0;
-            TabButton.BackgroundColor3 = Library.MainColor;
-            Library.RegistryMap[TabButton].Properties.BackgroundColor3 = 'MainColor';
-            TabFrame.Visible = true;
+    Blocker.BackgroundTransparency = 0;
+    TabButton.BackgroundColor3 = Library.MainColor;
+    Library.RegistryMap[TabButton].Properties.BackgroundColor3 = 'MainColor';
+
+    TabFrame.Visible = true;
+    TabFrame.Position = UDim2.new(0, 0, 0, 6);
+
+    TweenService:Create(TabFrame, TweenInfo.new(0.18, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+        Position = UDim2.new(0, 0, 0, 0);
+    }):Play();
+
+    for _, Desc in next, TabFrame:GetDescendants() do
+        if Desc:IsA('Frame') or Desc:IsA('ScrollingFrame') then
+            if Desc.BackgroundTransparency < 1 then
+                local orig = Desc.BackgroundTransparency;
+                Desc.BackgroundTransparency = 1;
+                TweenService:Create(Desc, TweenInfo.new(0.14, Enum.EasingStyle.Linear), {
+                    BackgroundTransparency = orig;
+                }):Play();
+            end;
+        elseif Desc:IsA('TextLabel') or Desc:IsA('TextBox') then
+            Desc.TextTransparency = 1;
+            TweenService:Create(Desc, TweenInfo.new(0.14, Enum.EasingStyle.Linear), {
+                TextTransparency = 0;
+            }):Play();
+        elseif Desc:IsA('ImageLabel') then
+            Desc.ImageTransparency = 1;
+            TweenService:Create(Desc, TweenInfo.new(0.14, Enum.EasingStyle.Linear), {
+                ImageTransparency = 0;
+            }):Play();
         end;
+    end;
+end;
 
         function Tab:HideTab()
-            Blocker.BackgroundTransparency = 1;
-            TabButton.BackgroundColor3 = Library.BackgroundColor;
-            Library.RegistryMap[TabButton].Properties.BackgroundColor3 = 'BackgroundColor';
-            TabFrame.Visible = false;
-        end;
+    Blocker.BackgroundTransparency = 1;
+    TabButton.BackgroundColor3 = Library.BackgroundColor;
+    Library.RegistryMap[TabButton].Properties.BackgroundColor3 = 'BackgroundColor';
+    TabFrame.Visible = false;
+    TabFrame.Position = UDim2.new(0, 0, 0, 0);
+end;
 
         function Tab:SetLayoutOrder(Position)
             TabButton.LayoutOrder = Position;
@@ -3247,14 +3276,18 @@ function Library:CreateWindow(...)
             });
 
             local GroupboxLabel = Library:CreateLabel({
-                Size = UDim2.new(1, 0, 0, 18);
-                Position = UDim2.new(0, 4, 0, 2);
-                TextSize = 14;
-                Text = Info.Name;
-                TextXAlignment = Enum.TextXAlignment.Left;
-                ZIndex = 5;
-                Parent = BoxInner;
-            });
+    Size = UDim2.new(1, -8, 0, 18);
+    Position = UDim2.new(0, 8, 0, 2);
+    TextSize = 13;
+    Text = Info.Name:upper();
+    TextXAlignment = Enum.TextXAlignment.Left;
+    TextColor3 = Library.AccentColor;
+    ZIndex = 5;
+    Parent = BoxInner;
+});
+
+Library:RemoveFromRegistry(GroupboxLabel);
+Library:AddToRegistry(GroupboxLabel, { TextColor3 = 'AccentColor' });
 
             local Container = Library:Create('Frame', {
                 BackgroundTransparency = 1;
