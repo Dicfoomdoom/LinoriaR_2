@@ -2031,6 +2031,35 @@ do
             BorderColor3 = 'AccentColorDark';
         });
 
+        Library:Create('Frame', {
+    BackgroundTransparency = 1;
+    BorderSizePixel = 0;
+    Size = UDim2.new(1, 0, 1, 0);
+    ZIndex = 10;
+    Parent = SliderInner;
+}):SetAttribute('__edge_gradient', true);
+
+Library:Create('UIGradient', {
+    Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0,   Color3.new(0, 0, 0));
+        ColorSequenceKeypoint.new(0.18, Color3.new(0, 0, 0));
+        ColorSequenceKeypoint.new(0.22, Color3.new(1, 1, 1));
+        ColorSequenceKeypoint.new(0.78, Color3.new(1, 1, 1));
+        ColorSequenceKeypoint.new(0.82, Color3.new(0, 0, 0));
+        ColorSequenceKeypoint.new(1,   Color3.new(0, 0, 0));
+    });
+    Transparency = NumberSequence.new({
+        NumberSequenceKeypoint.new(0,   0);
+        NumberSequenceKeypoint.new(0.18, 0);
+        NumberSequenceKeypoint.new(0.22, 1);
+        NumberSequenceKeypoint.new(0.78, 1);
+        NumberSequenceKeypoint.new(0.82, 0);
+        NumberSequenceKeypoint.new(1,   0);
+    });
+    Rotation = 90;
+    Parent = SliderInner;
+});
+
         local HideBorderRight = Library:Create('Frame', {
             BackgroundColor3 = Library.AccentColor;
             BorderSizePixel = 0;
