@@ -2933,7 +2933,7 @@ function Library:Notify(Text, Time)
         BackgroundTransparency = 0.65;
         BorderSizePixel = 0;
         Position = UDim2.new(0, 3, 1, -3);
-        Size = UDim2.new(0, totalWidth - 3, 0, 2);
+        Size = UDim2.new(0, totalWidth, 0, 2);
         ZIndex = 105;
         Parent = NotifyOuter;
     })
