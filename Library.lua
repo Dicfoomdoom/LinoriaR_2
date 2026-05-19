@@ -46,14 +46,27 @@ local function LoadCustomFont()
             return nil
         end
 
-        local writeOk, writeErr = pcall(writefile, FONT_PATH, response.Body)
+        local writeOk = pcall(writefile, FONT_PATH, response.Body)
         if not writeOk then
             return nil
         end
     end
 
+    if not getcustomasset then
+        return nil
+    end
+
+    local assetUri
+    local uriOk = pcall(function()
+        assetUri = getcustomasset(FONT_PATH)
+    end)
+
+    if not uriOk or not assetUri then
+        return nil
+    end
+
     local fontOk, fontResult = pcall(function()
-        return Font.new(FONT_PATH, Enum.FontWeight.Regular, Enum.FontStyle.Normal)
+        return Font.new(assetUri, Enum.FontWeight.Regular, Enum.FontStyle.Normal)
     end)
 
     if fontOk and fontResult then
@@ -3729,7 +3742,7 @@ end;
 
 do
     local PANEL_W = 168
-    local PANEL_H = 172
+    local PANEL_H = 160
 
     local PanelOuter = Library:Create('Frame', {
         BackgroundColor3 = Color3.new(0, 0, 0);
@@ -3866,10 +3879,10 @@ do
         return ValLabel;
     end
 
-    local TimeValue    = MakeRow(96,  'Time');
-    local PlayersValue = MakeRow(113, 'Players');
-    local FpsValue     = MakeRow(130, 'FPS');
-    local PingValue    = MakeRow(147, 'Ping');
+    local TimeValue    = MakeRow(90,  'Time');
+    local PlayersValue = MakeRow(106, 'Players');
+    local FpsValue     = MakeRow(122, 'FPS');
+    local PingValue    = MakeRow(138, 'Ping');
 
     local fpsCounter = 0
     local fpsClock   = 0
