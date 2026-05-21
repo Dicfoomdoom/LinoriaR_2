@@ -2901,38 +2901,82 @@ end;
 
 function Library:Notify(Text, Time)
     Time = tonumber(Time) or 5
+
     local XSize, YSize = Library:GetTextBounds(Text, Library.Font, 13)
-    YSize = YSize + 14
-    local timerWidth = 28
-    local totalWidth = XSize + 16 + timerWidth
+
+    YSize = YSize + 24
+
+    local timerWidth = 45
+    local totalWidth = XSize + 40 + timerWidth
 
     local NotifyOuter = Library:Create('Frame', {
         BorderSizePixel = 0;
         BackgroundTransparency = 1;
-        Position = UDim2.new(0, 0, 0, 0);
+
+        AnchorPoint = Vector2.new(0.5, 1);
+        Position = UDim2.new(0.5, 0, 0.84, -25);
+
         Size = UDim2.new(0, 0, 0, YSize);
+
         ClipsDescendants = true;
         ZIndex = 100;
         Parent = Library.NotificationArea;
     })
+
+    local Shadow = Library:Create('ImageLabel', {
+        Name = "Shadow";
+        AnchorPoint = Vector2.new(0.5, 0.5);
+        BackgroundTransparency = 1;
+        Position = UDim2.new(0.5, 0, 0.5, 4);
+        Size = UDim2.new(1, 30, 1, 30);
+        ZIndex = 99;
+        Image = "rbxassetid://1316045217";
+        ImageColor3 = Color3.new(0,0,0);
+        ImageTransparency = 1;
+        ScaleType = Enum.ScaleType.Slice;
+        SliceCenter = Rect.new(10,10,118,118);
+        Parent = NotifyOuter;
+    })
+
     local NotifyInner = Library:Create('Frame', {
         BackgroundColor3 = Library.MainColor;
+        BackgroundTransparency = 1;
         BorderSizePixel = 0;
         Size = UDim2.new(1, 0, 1, 0);
         ZIndex = 101;
         Parent = NotifyOuter;
     })
+
     Library:AddToRegistry(NotifyInner, {
         BackgroundColor3 = 'MainColor';
     }, true)
+
+    Library:Create('UICorner', {
+        CornerRadius = UDim.new(0, 8);
+        Parent = NotifyInner;
+    })
+
+    local Stroke = Library:Create('UIStroke', {
+        Color = Color3.fromRGB(255,255,255);
+        Transparency = 1;
+        Thickness = 1;
+        Parent = NotifyInner;
+    })
+
     local InnerFrame = Library:Create('Frame', {
         BackgroundColor3 = Color3.new(1, 1, 1);
+        BackgroundTransparency = 1;
         BorderSizePixel = 0;
-        Position = UDim2.new(0, 0, 0, 0);
         Size = UDim2.new(1, 0, 1, 0);
         ZIndex = 102;
         Parent = NotifyInner;
     })
+
+    Library:Create('UICorner', {
+        CornerRadius = UDim.new(0, 8);
+        Parent = InnerFrame;
+    })
+
     local Gradient = Library:Create('UIGradient', {
         Color = ColorSequence.new({
             ColorSequenceKeypoint.new(0, Library:GetDarkerColor(Library.MainColor));
@@ -2941,6 +2985,7 @@ function Library:Notify(Text, Time)
         Rotation = -90;
         Parent = InnerFrame;
     })
+
     Library:AddToRegistry(Gradient, {
         Color = function()
             return ColorSequence.new({
@@ -2949,75 +2994,136 @@ function Library:Notify(Text, Time)
             })
         end
     })
+
     local NotifyLabel = Library:CreateLabel({
-        Position = UDim2.new(0, 8, 0, 0);
-        Size = UDim2.new(1, -timerWidth - 10, 1, -4);
+        Position = UDim2.new(0, 14, 0, 0);
+        Size = UDim2.new(1, -timerWidth - 20, 1, 0);
+
         Text = Text;
+
         TextXAlignment = Enum.TextXAlignment.Left;
-        TextSize = 13;
+        TextYAlignment = Enum.TextYAlignment.Center;
+
+        TextSize = 14;
+        TextTransparency = 1;
+
         ZIndex = 103;
         Parent = InnerFrame;
     })
 
     local TimerLabel = Library:CreateLabel({
-        Position = UDim2.new(1, -timerWidth - 4, 0, 0);
-        Size = UDim2.new(0, timerWidth, 1, -4);
+        Position = UDim2.new(1, -timerWidth - 10, 0, 0);
+        Size = UDim2.new(0, timerWidth, 1, 0);
+
         Text = string.format('%.1fs', Time);
+
         TextXAlignment = Enum.TextXAlignment.Right;
-        TextSize = 11;
-        TextTransparency = 0.35;
+        TextYAlignment = Enum.TextYAlignment.Center;
+
+        TextSize = 12;
+        TextTransparency = 1;
+
         ZIndex = 103;
         Parent = InnerFrame;
     })
 
-    local ProgressBg = Library:Create('Frame', {
-        BackgroundColor3 = Color3.fromRGB(0, 0, 0);
-        BackgroundTransparency = 0.65;
-        BorderSizePixel = 0;
-        Position = UDim2.new(0, 3, 1, -3);
-        Size = UDim2.new(0, totalWidth, 0, 2);
-        ZIndex = 105;
-        Parent = NotifyOuter;
-    })
-    local ProgressFill = Library:Create('Frame', {
-        BackgroundColor3 = Library.AccentColor;
-        BorderSizePixel = 0;
-        Size = UDim2.new(1, 0, 1, 0);
-        ZIndex = 106;
-        Parent = ProgressBg;
-    })
-    Library:AddToRegistry(ProgressFill, {
-        BackgroundColor3 = 'AccentColor';
-    }, true)
+    pcall(function()
 
-    pcall(NotifyOuter.TweenSize, NotifyOuter,
-        UDim2.new(0, totalWidth, 0, YSize),
-        'Out', 'Quart', 0.35, true)
+        NotifyOuter:TweenPosition(
+            UDim2.new(0.5, 0, 0.90, 0),
+            Enum.EasingDirection.Out,
+            Enum.EasingStyle.Back,
+            0.45,
+            true
+        )
+
+        NotifyOuter:TweenSize(
+            UDim2.new(0, totalWidth, 0, YSize),
+            Enum.EasingDirection.Out,
+            Enum.EasingStyle.Quart,
+            0.35,
+            true
+        )
+
+    end)
 
     task.spawn(function()
-        wait(0.35)
 
-        pcall(ProgressFill.TweenSize, ProgressFill,
-            UDim2.new(0, 0, 1, 0),
-            'In', 'Linear', Time, true)
+        for i = 1, 0, -0.08 do
+
+            NotifyInner.BackgroundTransparency = i
+            InnerFrame.BackgroundTransparency = i
+
+            NotifyLabel.TextTransparency = i
+            TimerLabel.TextTransparency = 0.25 + (i * 0.75)
+
+            Shadow.ImageTransparency = 0.55 + (i * 0.45)
+            Stroke.Transparency = 0.8 + (i * 0.2)
+
+            task.wait(0.015)
+        end
+
+    end)
+
+    task.spawn(function()
+
+        wait(0.45)
 
         local remaining = Time
+
         while remaining > 0 do
+
             wait(0.1)
+
             remaining = math.max(0, remaining - 0.1)
+
             pcall(function()
+
                 if remaining > 0 then
                     TimerLabel.Text = string.format('%.1fs', remaining)
                 else
                     TimerLabel.Text = ''
                 end
+
             end)
         end
 
-        pcall(NotifyOuter.TweenSize, NotifyOuter,
-            UDim2.new(0, 0, 0, YSize),
-            'In', 'Quart', 0.3, true)
+        pcall(function()
+
+            NotifyOuter:TweenPosition(
+                UDim2.new(0.5, 0, 1, 60),
+                Enum.EasingDirection.In,
+                Enum.EasingStyle.Quart,
+                0.3,
+                true
+            )
+
+            NotifyOuter:TweenSize(
+                UDim2.new(0, 0, 0, YSize),
+                Enum.EasingDirection.In,
+                Enum.EasingStyle.Quart,
+                0.3,
+                true
+            )
+
+        end)
+
+        for i = 0, 1, 0.08 do
+
+            NotifyInner.BackgroundTransparency = i
+            InnerFrame.BackgroundTransparency = i
+
+            NotifyLabel.TextTransparency = i
+            TimerLabel.TextTransparency = i
+
+            Shadow.ImageTransparency = 0.55 + (i * 0.45)
+            Stroke.Transparency = 0.8 + (i * 0.2)
+
+            task.wait(0.01)
+        end
+
         wait(0.3)
+
         NotifyOuter:Destroy()
     end)
 end
