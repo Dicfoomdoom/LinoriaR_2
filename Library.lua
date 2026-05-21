@@ -208,7 +208,6 @@ end;
 function Library:CreateLabel(Properties, IsHud)
     local _Instance = Library:Create('TextLabel', {
         BackgroundTransparency = 1;
-        Font = Library.Font;
         TextColor3 = Library.FontColor;
         TextSize = 16;
         TextStrokeTransparency = 0;
@@ -216,6 +215,8 @@ function Library:CreateLabel(Properties, IsHud)
 
     if Library.CustomFontFace then
         _Instance.FontFace = Library.CustomFontFace;
+    else
+        _Instance.Font = Library.Font;
     end
 
     Library:ApplyTextStroke(_Instance);
