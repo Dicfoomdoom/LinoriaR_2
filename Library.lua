@@ -206,27 +206,28 @@ function Library:ApplyTextStroke(Inst)
 end;
 
 function Library:CreateLabel(Properties, IsHud)
-    local _Instance = Library:Create('TextLabel', {
+    local props = {
         BackgroundTransparency = 1;
         TextColor3 = Library.FontColor;
         TextSize = 16;
         TextStrokeTransparency = 0;
-    });
-
+    }
+    
     if Library.CustomFontFace then
-        _Instance.FontFace = Library.CustomFontFace;
+        props.FontFace = Library.CustomFontFace
     else
-        _Instance.Font = Library.Font;
+        props.Font = Library.Font
     end
 
-    Library:ApplyTextStroke(_Instance);
+    local _Instance = Library:Create("TextLabel", props)
+    Library:ApplyTextStroke(_Instance)
 
     Library:AddToRegistry(_Instance, {
-        TextColor3 = 'FontColor';
-    }, IsHud);
+        TextColor3 = "FontColor";
+    }, IsHud)
 
-    return Library:Create(_Instance, Properties);
-end;
+    return Library:Create(_Instance, Properties)
+end
 
 function Library:MakeDraggable(Instance, Cutoff)
     Instance.Active = true;
