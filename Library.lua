@@ -214,8 +214,12 @@ function Library:Create(Class, Properties)
     end;
 
     for Property, Value in next, Properties do
-        _Instance[Property] = Value;
-    end;
+        if Library.CustomFontFace and (Property == 'Font') then
+            _Instance['FontFace'] = Library.CustomFontFace
+        else
+            _Instance[Property] = Value;
+        end
+    end
 
     return _Instance;
 end;
