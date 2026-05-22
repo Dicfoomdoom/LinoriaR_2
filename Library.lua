@@ -20,8 +20,6 @@ ScreenGui.Parent = CoreGui;
 local FONT_URL  = "https://raw.githubusercontent.com/llocalsskoi/LinoriaR_2/refs/heads/main/addons/Font.ttf"
 local FONT_PATH = "LinoriaCustomFont.ttf"
 
-local CustomFontFace = nil
-
 local function LoadCustomFont()
     if not (writefile and readfile and isfile) then
         warn("[Font] нет writefile/readfile/isfile")
@@ -102,7 +100,8 @@ local function LoadCustomFont()
         return nil
     end
 end
-CustomFontFace = LoadCustomFont()
+
+local CustomFontFace = LoadCustomFont()
 
 local Toggles = {};
 local Options = {};
