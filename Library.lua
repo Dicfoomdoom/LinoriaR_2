@@ -24,44 +24,69 @@ local CustomFontFace = nil
 
 local function LoadCustomFont()
     if not (writefile and readfile and isfile) then
+        warn("[Font] нет writefile/readfile/isfile")
         return nil
     end
 
     local httpFunc = (syn and syn.request) or http_request or request or (http and http.request)
     if not httpFunc then
+        warn("[Font] нет http функции")
         return nil
     end
 
     if not isfile(FONT_PATH) then
+        warn("[Font] файла нет, скачиваем...")
         local ok, response = pcall(httpFunc, {
             Url    = FONT_URL,
             Method = "GET",
         })
 
-        if not ok or not response then
+        if not ok then
+            warn("[Font] запрос упал:", response)
             return nil
         end
+
+        if not response then
+            warn("[Font] response = nil")
+            return nil
+        end
+
+        warn("[Font] статус:", response.StatusCode)
 
         if response.StatusCode ~= 200 then
             return nil
         end
 
-        local writeOk = pcall(writefile, FONT_PATH, response.Body)
+        warn("[Font] размер тела:", #(response.Body or ""))
+
+        local writeOk, writeErr = pcall(writefile, FONT_PATH, response.Body)
         if not writeOk then
+            warn("[Font] writefile упал:", writeErr)
             return nil
         end
+        warn("[Font] файл записан")
+    else
+        warn("[Font] файл уже есть")
     end
 
     if not getcustomasset then
+        warn("[Font] нет getcustomasset")
         return nil
     end
 
     local assetUri
-    local uriOk = pcall(function()
+    local uriOk, uriErr = pcall(function()
         assetUri = getcustomasset(FONT_PATH)
     end)
 
-    if not uriOk or not assetUri then
+    if not uriOk then
+        warn("[Font] getcustomasset упал:", uriErr)
+        return nil
+    end
+
+    warn("[Font] assetUri:", tostring(assetUri))
+
+    if not assetUri then
         return nil
     end
 
@@ -69,13 +94,14 @@ local function LoadCustomFont()
         return Font.new(assetUri, Enum.FontWeight.Regular, Enum.FontStyle.Normal)
     end)
 
+    warn("[Font] Font.new ok:", fontOk, tostring(fontResult))
+
     if fontOk and fontResult then
         return fontResult
     else
         return nil
     end
 end
-
 CustomFontFace = LoadCustomFont()
 
 local Toggles = {};
