@@ -133,6 +133,8 @@ local Library = {
     ScreenGui = ScreenGui;
 };
 
+print("CustomFontFace in Library:", Library.CustomFontFace)
+
 local RainbowStep = 0
 local Hue = 0
 
