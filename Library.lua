@@ -141,6 +141,8 @@ task.spawn(function()
     test.Position = UDim2.fromOffset(0, 0)
     test.ZIndex = 999
     test.Parent = ScreenGui
+
+    print(test)
     
     if Library.CustomFontFace then
         test.FontFace = Library.CustomFontFace
