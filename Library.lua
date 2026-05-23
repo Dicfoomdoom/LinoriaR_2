@@ -17,92 +17,6 @@ ProtectGui(ScreenGui);
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global;
 ScreenGui.Parent = CoreGui;
 
-local FONT_URL  = "https://raw.githubusercontent.com/llocalsskoi/LinoriaR_2/refs/heads/main/addons/Font.ttf"
-local FONT_PATH = "LinoriaCustomFont.ttf"
-
-local function LoadCustomFont()
-    if not (writefile and readfile and isfile) then
-        warn("[Font] нет writefile/readfile/isfile")
-        return nil
-    end
-
-    local httpFunc = (syn and syn.request) or http_request or request or (http and http.request)
-    if not httpFunc then
-        warn("[Font] нет http функции")
-        return nil
-    end
-
-    if not isfile(FONT_PATH) then
-        warn("[Font] файла нет, скачиваем...")
-        local ok, response = pcall(httpFunc, {
-            Url    = FONT_URL,
-            Method = "GET",
-        })
-
-        if not ok then
-            warn("[Font] запрос упал:", response)
-            return nil
-        end
-
-        if not response then
-            warn("[Font] response = nil")
-            return nil
-        end
-
-        warn("[Font] статус:", response.StatusCode)
-
-        if response.StatusCode ~= 200 then
-            return nil
-        end
-
-        warn("[Font] размер тела:", #(response.Body or ""))
-
-        local writeOk, writeErr = pcall(writefile, FONT_PATH, response.Body)
-        if not writeOk then
-            warn("[Font] writefile упал:", writeErr)
-            return nil
-        end
-        warn("[Font] файл записан")
-    else
-        warn("[Font] файл уже есть")
-    end
-
-    if not getcustomasset then
-        warn("[Font] нет getcustomasset")
-        return nil
-    end
-
-    local assetUri
-    local uriOk, uriErr = pcall(function()
-        assetUri = getcustomasset(FONT_PATH)
-    end)
-
-    if not uriOk then
-        warn("[Font] getcustomasset упал:", uriErr)
-        return nil
-    end
-
-    warn("[Font] assetUri:", tostring(assetUri))
-
-    if not assetUri then
-        return nil
-    end
-
-    local fontOk, fontResult = pcall(function()
-        return Font.new(assetUri, Enum.FontWeight.Regular, Enum.FontStyle.Normal)
-    end)
-
-    warn("[Font] Font.new ok:", fontOk, tostring(fontResult))
-
-    if fontOk and fontResult then
-        return fontResult
-    else
-        return nil
-    end
-end
-
-local CustomFontFace = LoadCustomFont()
-
 local Toggles = {};
 local Options = {};
 
@@ -124,7 +38,6 @@ local Library = {
 
     Black = Color3.new(0, 0, 0);
     Font = Enum.Font.Code,
-    CustomFontFace = CustomFontFace;
 
     OpenedFrames = {};
     DependencyBoxes = {};
@@ -132,26 +45,6 @@ local Library = {
     Signals = {};
     ScreenGui = ScreenGui;
 };
-
-task.spawn(function()
-    task.wait(1)
-    local test = Instance.new("TextLabel")
-    test.Text = "TEST FONT"
-    test.Size = UDim2.fromOffset(200, 50)
-    test.Position = UDim2.fromOffset(0, 0)
-    test.ZIndex = 999
-    test.Parent = ScreenGui
-
-    print(test)
-    
-    if Library.CustomFontFace then
-        test.FontFace = Library.CustomFontFace
-        print("FontFace applied:", test.FontFace)
-        print("Font after apply:", test.Font)
-    end
-end)
-
-print("CustomFontFace in Library:", Library.CustomFontFace)
 
 local RainbowStep = 0
 local Hue = 0
@@ -233,17 +126,7 @@ function Library:Create(Class, Properties)
     end;
 
     for Property, Value in next, Properties do
-        if Library.CustomFontFace and (Property == 'Font') then
-            _Instance['FontFace'] = Library.CustomFontFace
-        else
-            _Instance[Property] = Value;
-        end
-    end
-
-    if Library.CustomFontFace then
-        pcall(function()
-            _Instance.FontFace = Library.CustomFontFace
-        end)
+         _Instance[Property] = Value;
     end
 
     return _Instance;
@@ -266,7 +149,7 @@ function Library:CreateLabel(Properties, IsHud)
         TextColor3 = Library.FontColor;
         TextSize = 16;
         TextStrokeTransparency = 0;
-        FontFace = Library.CustomFontFace or Font.new("rbxasset://fonts/families/RobotoMono.json");
+        Font = Library.Font
     }
 
     local _Instance = Library:Create("TextLabel", props)
@@ -679,7 +562,6 @@ do
             Parent = HueBoxInner;
         });
 
-        if Library.CustomFontFace then HueBox.FontFace = Library.CustomFontFace end
         Library:ApplyTextStroke(HueBox);
 
         local RgbBoxBase = Library:Create(HueBoxOuter:Clone(), {
@@ -693,8 +575,6 @@ do
             PlaceholderText = 'RGB color',
             TextColor3 = Library.FontColor
         });
-
-        if Library.CustomFontFace then RgbBox.FontFace = Library.CustomFontFace end
 
         local TransparencyBoxOuter, TransparencyBoxInner, TransparencyCursor;
         
@@ -1803,7 +1683,6 @@ do
             Parent = InputContainer;
         });
 
-        if Library.CustomFontFace then Box.FontFace = Library.CustomFontFace end
         Library:ApplyTextStroke(Box);
 
         function Textbox:SetValue(Text)
@@ -2952,230 +2831,132 @@ function Library:SetWatermark(Text)
 end;
 
 function Library:Notify(Text, Time)
-    Time = tonumber(Time) or 5
-
-    local XSize, YSize = Library:GetTextBounds(Text, Library.Font, 13)
-
-    YSize = YSize + 24
-
-    local timerWidth = 45
-    local totalWidth = XSize + 40 + timerWidth
+    local XSize, YSize = Library:GetTextBounds(Text, Library.Font, 14)
+    YSize = YSize + 7
+    local Duration = Time or 5
 
     local NotifyOuter = Library:Create('Frame', {
-        BorderSizePixel = 0;
-        BackgroundTransparency = 1;
-
-        AnchorPoint = Vector2.new(0.5, 1);
-        Position = UDim2.new(0.5, 0, 0.84, -25);
-
-        Size = UDim2.new(0, 0, 0, YSize);
-
-        ClipsDescendants = true;
-        ZIndex = 100;
-        Parent = Library.NotificationArea;
-    })
-
-    local Shadow = Library:Create('ImageLabel', {
-        Name = "Shadow";
-        AnchorPoint = Vector2.new(0.5, 0.5);
-        BackgroundTransparency = 1;
-        Position = UDim2.new(0.5, 0, 0.5, 4);
-        Size = UDim2.new(1, 30, 1, 30);
-        ZIndex = 99;
-        Image = "rbxassetid://1316045217";
-        ImageColor3 = Color3.new(0,0,0);
-        ImageTransparency = 1;
-        ScaleType = Enum.ScaleType.Slice;
-        SliceCenter = Rect.new(10,10,118,118);
-        Parent = NotifyOuter;
+        BorderColor3 = Color3.new(0, 0, 0),
+        Position = UDim2.new(0, 100, 0, 10),
+        Size = UDim2.new(0, 0, 0, YSize),
+        ClipsDescendants = true,
+        ZIndex = 100,
+        Parent = Library.NotificationArea,
     })
 
     local NotifyInner = Library:Create('Frame', {
-        BackgroundColor3 = Library.MainColor;
-        BackgroundTransparency = 1;
-        BorderSizePixel = 0;
-        Size = UDim2.new(1, 0, 1, 0);
-        ZIndex = 101;
-        Parent = NotifyOuter;
+        BackgroundColor3 = Library.MainColor,
+        BorderColor3 = Library.OutlineColor,
+        BorderMode = Enum.BorderMode.Inset,
+        Size = UDim2.new(1, 0, 1, 0),
+        ZIndex = 101,
+        Parent = NotifyOuter,
     })
 
     Library:AddToRegistry(NotifyInner, {
-        BackgroundColor3 = 'MainColor';
+        BackgroundColor3 = 'MainColor',
+        BorderColor3 = 'OutlineColor',
     }, true)
 
-    Library:Create('UICorner', {
-        CornerRadius = UDim.new(0, 8);
-        Parent = NotifyInner;
-    })
-
-    local Stroke = Library:Create('UIStroke', {
-        Color = Color3.fromRGB(255,255,255);
-        Transparency = 1;
-        Thickness = 1;
-        Parent = NotifyInner;
-    })
-
     local InnerFrame = Library:Create('Frame', {
-        BackgroundColor3 = Color3.new(1, 1, 1);
-        BackgroundTransparency = 1;
-        BorderSizePixel = 0;
-        Size = UDim2.new(1, 0, 1, 0);
-        ZIndex = 102;
-        Parent = NotifyInner;
-    })
-
-    Library:Create('UICorner', {
-        CornerRadius = UDim.new(0, 8);
-        Parent = InnerFrame;
+        BackgroundColor3 = Color3.new(1, 1, 1),
+        BorderSizePixel = 0,
+        Position = UDim2.new(0, 1, 0, 1),
+        Size = UDim2.new(1, -2, 1, -2),
+        ZIndex = 102,
+        Parent = NotifyInner,
     })
 
     local Gradient = Library:Create('UIGradient', {
         Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0, Library:GetDarkerColor(Library.MainColor));
-            ColorSequenceKeypoint.new(1, Library.MainColor);
-        });
-        Rotation = -90;
-        Parent = InnerFrame;
+            ColorSequenceKeypoint.new(0, Library:GetDarkerColor(Library.MainColor)),
+            ColorSequenceKeypoint.new(1, Library.MainColor),
+        }),
+        Rotation = -90,
+        Parent = InnerFrame,
     })
 
     Library:AddToRegistry(Gradient, {
         Color = function()
             return ColorSequence.new({
-                ColorSequenceKeypoint.new(0, Library:GetDarkerColor(Library.MainColor));
-                ColorSequenceKeypoint.new(1, Library.MainColor);
+                ColorSequenceKeypoint.new(0, Library:GetDarkerColor(Library.MainColor)),
+                ColorSequenceKeypoint.new(1, Library.MainColor),
             })
         end
     })
 
     local NotifyLabel = Library:CreateLabel({
-        Position = UDim2.new(0, 14, 0, 0);
-        Size = UDim2.new(1, -timerWidth - 20, 1, 0);
-
-        Text = Text;
-
-        TextXAlignment = Enum.TextXAlignment.Left;
-        TextYAlignment = Enum.TextYAlignment.Center;
-
-        TextSize = 14;
-        TextTransparency = 1;
-
-        ZIndex = 103;
-        Parent = InnerFrame;
+        Position = UDim2.new(0, 4, 0, 0),
+        Size = UDim2.new(1, -4, 1, -3), -- leave a little room above timer
+        Text = Text,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        TextSize = 14,
+        ZIndex = 103,
+        Parent = InnerFrame,
     })
 
-    local TimerLabel = Library:CreateLabel({
-        Position = UDim2.new(1, -timerWidth - 10, 0, 0);
-        Size = UDim2.new(0, timerWidth, 1, 0);
-
-        Text = string.format('%.1fs', Time);
-
-        TextXAlignment = Enum.TextXAlignment.Right;
-        TextYAlignment = Enum.TextYAlignment.Center;
-
-        TextSize = 12;
-        TextTransparency = 1;
-
-        ZIndex = 103;
-        Parent = InnerFrame;
+    local LeftColor = Library:Create('Frame', {
+        BackgroundColor3 = Library.AccentColor,
+        BorderSizePixel = 0,
+        Position = UDim2.new(0, -1, 0, -1),
+        Size = UDim2.new(0, 3, 1, 2),
+        ZIndex = 104,
+        Parent = NotifyOuter,
     })
 
-    pcall(function()
+    Library:AddToRegistry(LeftColor, {
+        BackgroundColor3 = 'AccentColor',
+    }, true)
 
-        NotifyOuter:TweenPosition(
-            UDim2.new(0.5, 0, 0.90, 0),
-            Enum.EasingDirection.Out,
-            Enum.EasingStyle.Back,
-            0.45,
-            true
-        )
+    -- Timer bar background
+    local TimerBg = Library:Create('Frame', {
+        BackgroundColor3 = Library:GetDarkerColor(Library.MainColor),
+        BorderSizePixel = 0,
+        Position = UDim2.new(0, 0, 1, -2),
+        Size = UDim2.new(1, 0, 0, 2),
+        ZIndex = 105,
+        Parent = InnerFrame,
+    })
 
-        NotifyOuter:TweenSize(
-            UDim2.new(0, totalWidth, 0, YSize),
-            Enum.EasingDirection.Out,
-            Enum.EasingStyle.Quart,
-            0.35,
-            true
-        )
+    -- Timer bar fill (accent colored, shrinks left to right)
+    local TimerFill = Library:Create('Frame', {
+        BackgroundColor3 = Library.AccentColor,
+        BorderSizePixel = 0,
+        Size = UDim2.new(1, 0, 1, 0),
+        ZIndex = 106,
+        Parent = TimerBg,
+    })
 
-    end)
+    Library:AddToRegistry(TimerFill, {
+        BackgroundColor3 = 'AccentColor',
+    }, true)
 
-    task.spawn(function()
+    -- Slide in
+    local TweenService = game:GetService('TweenService')
+    local fullWidth = XSize + 8 + 4
 
-        for i = 1, 0, -0.08 do
-
-            NotifyInner.BackgroundTransparency = i
-            InnerFrame.BackgroundTransparency = i
-
-            NotifyLabel.TextTransparency = i
-            TimerLabel.TextTransparency = 0.25 + (i * 0.75)
-
-            Shadow.ImageTransparency = 0.55 + (i * 0.45)
-            Stroke.Transparency = 0.8 + (i * 0.2)
-
-            task.wait(0.015)
-        end
-
-    end)
+    -- Slide open: width 0 -> full
+    pcall(NotifyOuter.TweenSize, NotifyOuter,
+        UDim2.new(0, fullWidth, 0, YSize), 'Out', 'Back', 0.45, true)
 
     task.spawn(function()
+        -- Wait for open tween to mostly finish
+        task.wait(0.5)
 
-        wait(0.45)
+        -- Drain the timer bar over Duration seconds
+        local timerTween = TweenService:Create(TimerFill,
+            TweenInfo.new(Duration, Enum.EasingStyle.Linear, Enum.EasingDirection.In),
+            { Size = UDim2.new(0, 0, 1, 0) }
+        )
+        timerTween:Play()
 
-        local remaining = Time
+        task.wait(Duration)
 
-        while remaining > 0 do
+        -- Slide close: width full -> 0, with slight bounce via Back easing
+        pcall(NotifyOuter.TweenSize, NotifyOuter,
+            UDim2.new(0, 0, 0, YSize), 'In', 'Back', 0.35, true)
 
-            wait(0.1)
-
-            remaining = math.max(0, remaining - 0.1)
-
-            pcall(function()
-
-                if remaining > 0 then
-                    TimerLabel.Text = string.format('%.1fs', remaining)
-                else
-                    TimerLabel.Text = ''
-                end
-
-            end)
-        end
-
-        pcall(function()
-
-            NotifyOuter:TweenPosition(
-                UDim2.new(0.5, 0, 1, 60),
-                Enum.EasingDirection.In,
-                Enum.EasingStyle.Quart,
-                0.3,
-                true
-            )
-
-            NotifyOuter:TweenSize(
-                UDim2.new(0, 0, 0, YSize),
-                Enum.EasingDirection.In,
-                Enum.EasingStyle.Quart,
-                0.3,
-                true
-            )
-
-        end)
-
-        for i = 0, 1, 0.08 do
-
-            NotifyInner.BackgroundTransparency = i
-            InnerFrame.BackgroundTransparency = i
-
-            NotifyLabel.TextTransparency = i
-            TimerLabel.TextTransparency = i
-
-            Shadow.ImageTransparency = 0.55 + (i * 0.45)
-            Stroke.Transparency = 0.8 + (i * 0.2)
-
-            task.wait(0.01)
-        end
-
-        wait(0.3)
-
+        task.wait(0.35)
         NotifyOuter:Destroy()
     end)
 end
