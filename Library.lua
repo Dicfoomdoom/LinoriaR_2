@@ -220,6 +220,12 @@ function Library:Create(Class, Properties)
         end
     end
 
+    if Library.CustomFontFace then
+        pcall(function()
+            _Instance.FontFace = Library.CustomFontFace
+        end)
+    end
+
     return _Instance;
 end;
 
@@ -240,13 +246,8 @@ function Library:CreateLabel(Properties, IsHud)
         TextColor3 = Library.FontColor;
         TextSize = 16;
         TextStrokeTransparency = 0;
+        FontFace = Library.CustomFontFace or Font.new("rbxasset://fonts/families/RobotoMono.json");
     }
-    
-    if Library.CustomFontFace then
-        props.FontFace = Library.CustomFontFace
-    else
-        props.Font = Library.Font
-    end
 
     local _Instance = Library:Create("TextLabel", props)
     Library:ApplyTextStroke(_Instance)
