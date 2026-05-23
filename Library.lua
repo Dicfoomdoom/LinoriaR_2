@@ -133,6 +133,22 @@ local Library = {
     ScreenGui = ScreenGui;
 };
 
+task.spawn(function()
+    task.wait(1)
+    local test = Instance.new("TextLabel")
+    test.Text = "TEST FONT"
+    test.Size = UDim2.fromOffset(200, 50)
+    test.Position = UDim2.fromOffset(0, 0)
+    test.ZIndex = 999
+    test.Parent = ScreenGui
+    
+    if Library.CustomFontFace then
+        test.FontFace = Library.CustomFontFace
+        print("FontFace applied:", test.FontFace)
+        print("Font after apply:", test.Font)
+    end
+end)
+
 print("CustomFontFace in Library:", Library.CustomFontFace)
 
 local RainbowStep = 0
