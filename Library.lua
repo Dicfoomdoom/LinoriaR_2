@@ -32,12 +32,12 @@ local Library = {
 
     HudRegistry = {};
 
-    FontColor       = Color3.fromRGB(220, 180, 255);
-    MainColor       = Color3.fromRGB(15,  5,   30);
-    BackgroundColor = Color3.fromRGB(8,   3,   18);
-    AccentColor     = Color3.fromRGB(40,  15,  65);
-    OutlineColor    = Color3.fromRGB(55,  20,  90);
-    RiskColor       = Color3.fromRGB(255, 50,  50);
+    Library.FontColor       = Color3.fromRGB(180, 210, 255);
+    Library.MainColor       = Color3.fromRGB(8,   18,  40);
+    Library.BackgroundColor = Color3.fromRGB(4,   10,  24);
+    Library.AccentColor     = Color3.fromRGB(50,  120, 255);
+    Library.OutlineColor    = Color3.fromRGB(25,  50,  100);
+    Library.RiskColor       = Color3.fromRGB(255, 70,  70);
 
     Black = Color3.new(0, 0, 0);
     Font = Font.new("rbxassetid://12187371840", Enum.FontWeight.Regular),
@@ -2835,15 +2835,36 @@ function Library:SetWatermark(Text)
 end;
 
 function Library:Notify(Text, Time)
-    local XSize, YSize = Library:GetTextBounds(Text, Library.Font, 14)
-    YSize = YSize + 7
     local Duration = Time or 5
+
+    local TempLabel = Library:Create('TextLabel', {
+        BackgroundTransparency = 1;
+        Text = Text;
+        FontFace = Library.Font;
+        TextSize = 14;
+        TextWrapped = true;
+        Size = UDim2.fromOffset(240, 1000);
+        Parent = ScreenGui;
+        ZIndex = -1;
+    })
+
+    RunService.Heartbeat:Wait()
+
+    local bounds = TempLabel.TextBounds
+    TempLabel:Destroy()
+
+    local PADDING_H = 8
+    local PADDING_V = 10
+    local ACCENT_W  = 3
+
+    local notifyW = math.max(bounds.X + PADDING_H + ACCENT_W + 4, 120)
+    local notifyH = bounds.Y + PADDING_V
 
     local NotifyOuter = Library:Create('Frame', {
         BorderColor3 = Color3.new(0, 0, 0),
-        Position = UDim2.new(0, 100, 0, 10),
-        Size = UDim2.new(0, 0, 0, YSize),
+        Size = UDim2.fromOffset(notifyW, notifyH),
         ClipsDescendants = true,
+        BackgroundTransparency = 1,
         ZIndex = 100,
         Parent = Library.NotificationArea,
     })
@@ -2853,6 +2874,7 @@ function Library:Notify(Text, Time)
         BorderColor3 = Library.OutlineColor,
         BorderMode = Enum.BorderMode.Inset,
         Size = UDim2.new(1, 0, 1, 0),
+        Position = UDim2.fromOffset(-notifyW, 0),
         ZIndex = 101,
         Parent = NotifyOuter,
     })
@@ -2890,10 +2912,12 @@ function Library:Notify(Text, Time)
     })
 
     local NotifyLabel = Library:CreateLabel({
-        Position = UDim2.new(0, 4, 0, 0),
-        Size = UDim2.new(1, -4, 1, -3), -- leave a little room above timer
+        Position = UDim2.new(0, ACCENT_W + 4, 0, 0),
+        Size = UDim2.new(1, -(ACCENT_W + 8), 1, 0),
         Text = Text,
         TextXAlignment = Enum.TextXAlignment.Left,
+        TextYAlignment = Enum.TextYAlignment.Center,
+        TextWrapped = true,
         TextSize = 14,
         ZIndex = 103,
         Parent = InnerFrame,
@@ -2902,65 +2926,30 @@ function Library:Notify(Text, Time)
     local LeftColor = Library:Create('Frame', {
         BackgroundColor3 = Library.AccentColor,
         BorderSizePixel = 0,
-        Position = UDim2.new(0, -1, 0, -1),
-        Size = UDim2.new(0, 3, 1, 2),
+        Position = UDim2.new(0, 0, 0, 0),
+        Size = UDim2.new(0, ACCENT_W, 1, 0),
         ZIndex = 104,
-        Parent = NotifyOuter,
+        Parent = InnerFrame,
     })
 
     Library:AddToRegistry(LeftColor, {
         BackgroundColor3 = 'AccentColor',
     }, true)
 
-    -- Timer bar background
-    local TimerBg = Library:Create('Frame', {
-        BackgroundColor3 = Library:GetDarkerColor(Library.MainColor),
-        BorderSizePixel = 0,
-        Position = UDim2.new(0, 0, 1, -2),
-        Size = UDim2.new(1, 0, 0, 2),
-        ZIndex = 105,
-        Parent = InnerFrame,
-    })
-
-    -- Timer bar fill (accent colored, shrinks left to right)
-    local TimerFill = Library:Create('Frame', {
-        BackgroundColor3 = Library.AccentColor,
-        BorderSizePixel = 0,
-        Size = UDim2.new(1, 0, 1, 0),
-        ZIndex = 106,
-        Parent = TimerBg,
-    })
-
-    Library:AddToRegistry(TimerFill, {
-        BackgroundColor3 = 'AccentColor',
-    }, true)
-
-    -- Slide in
-    local TweenService = game:GetService('TweenService')
-    local fullWidth = XSize + 8 + 4
-
-    -- Slide open: width 0 -> full
-    pcall(NotifyOuter.TweenSize, NotifyOuter,
-        UDim2.new(0, fullWidth, 0, YSize), 'Out', 'Back', 0.45, true)
+    -- slide in слева
+    TweenService:Create(NotifyInner, TweenInfo.new(0.35, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+        Position = UDim2.fromOffset(0, 0),
+    }):Play()
 
     task.spawn(function()
-        -- Wait for open tween to mostly finish
-        task.wait(0.5)
-
-        -- Drain the timer bar over Duration seconds
-        local timerTween = TweenService:Create(TimerFill,
-            TweenInfo.new(Duration, Enum.EasingStyle.Linear, Enum.EasingDirection.In),
-            { Size = UDim2.new(0, 0, 1, 0) }
-        )
-        timerTween:Play()
-
         task.wait(Duration)
 
-        -- Slide close: width full -> 0, with slight bounce via Back easing
-        pcall(NotifyOuter.TweenSize, NotifyOuter,
-            UDim2.new(0, 0, 0, YSize), 'In', 'Back', 0.35, true)
+        -- slide out вправо
+        TweenService:Create(NotifyInner, TweenInfo.new(0.25, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {
+            Position = UDim2.fromOffset(notifyW, 0),
+        }):Play()
 
-        task.wait(0.35)
+        task.wait(0.25)
         NotifyOuter:Destroy()
     end)
 end
