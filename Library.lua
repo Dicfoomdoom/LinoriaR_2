@@ -3004,6 +3004,16 @@ function Library:CreateWindow(...)
         Parent = Outer;
     });
 
+    Library:Create('UIGradient', {
+        Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0,   Color3.fromRGB(14,  32,  72));
+            ColorSequenceKeypoint.new(0.45, Color3.fromRGB(8,   18,  40));
+            ColorSequenceKeypoint.new(1,   Color3.fromRGB(3,   8,   20));
+        });
+        Rotation = 90;
+        Parent = Inner;
+    });
+
     Library:AddToRegistry(Inner, {
         BackgroundColor3 = 'MainColor';
         BorderColor3 = 'AccentColor';
@@ -3242,6 +3252,15 @@ end;
         Size = UDim2.new(1, 0, 0, 507 + 2);
         ZIndex = 2;
         Parent = Info.Side == 1 and LeftSide or RightSide;
+    });
+
+    Library:Create('UIGradient', {
+        Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0,   Color3.fromRGB(6,  15, 35));
+            ColorSequenceKeypoint.new(1,   Color3.fromRGB(3,   7,  18));
+        });
+        Rotation = 90;
+        Parent = BoxOuter;
     });
 
     Library:AddToRegistry(BoxOuter, {
