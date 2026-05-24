@@ -2893,15 +2893,6 @@ function Library:Notify(Text, Time)
         Parent = NotifyInner,
     })
 
-    local Gradient = Library:Create('UIGradient', {
-        Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0, Library:GetDarkerColor(Library.MainColor)),
-            ColorSequenceKeypoint.new(1, Library.MainColor),
-        }),
-        Rotation = -90,
-        Parent = InnerFrame,
-    })
-
     Library:AddToRegistry(Gradient, {
         Color = function()
             return ColorSequence.new({
@@ -3002,16 +2993,6 @@ function Library:CreateWindow(...)
         Size = UDim2.new(1, -2, 1, -2);
         ZIndex = 1;
         Parent = Outer;
-    });
-
-    Library:Create('UIGradient', {
-        Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0,   Color3.fromRGB(14,  32,  72));
-            ColorSequenceKeypoint.new(0.45, Color3.fromRGB(8,   18,  40));
-            ColorSequenceKeypoint.new(1,   Color3.fromRGB(3,   8,   20));
-        });
-        Rotation = 90;
-        Parent = Inner;
     });
 
     Library:AddToRegistry(Inner, {
@@ -3252,15 +3233,6 @@ end;
         Size = UDim2.new(1, 0, 0, 507 + 2);
         ZIndex = 2;
         Parent = Info.Side == 1 and LeftSide or RightSide;
-    });
-
-    Library:Create('UIGradient', {
-        Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0,   Color3.fromRGB(6,  15, 35));
-            ColorSequenceKeypoint.new(1,   Color3.fromRGB(3,   7,  18));
-        });
-        Rotation = 90;
-        Parent = BoxOuter;
     });
 
     Library:AddToRegistry(BoxOuter, {
