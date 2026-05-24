@@ -37,7 +37,7 @@ local Library = {
     RiskColor       = Color3.fromRGB(255, 50,  50);
 
     Black = Color3.new(0, 0, 0);
-    Font = Enum.Font.Code,
+    Font = Font.new("rbxasset://fonts/families/Silkscreen.json", Enum.FontWeight.Regular);
 
     OpenedFrames = {};
     DependencyBoxes = {};
@@ -307,7 +307,8 @@ function Library:MapValue(Value, MinA, MaxA, MinB, MaxB)
 end;
 
 function Library:GetTextBounds(Text, Font, Size, Resolution)
-    local Bounds = TextService:GetTextSize(Text, Size, Font, Resolution or Vector2.new(1920, 1080))
+    local FontEnum = typeof(Font) == 'EnumItem' and Font or Enum.Font.Code
+    local Bounds = TextService:GetTextSize(Text, Size, FontEnum, Resolution or Vector2.new(1920, 1080))
     return Bounds.X, Bounds.Y
 end;
 
