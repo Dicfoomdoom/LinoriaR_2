@@ -39,7 +39,7 @@ local Library = {
     RiskColor       = Color3.fromRGB(255, 50,  50);
 
     Black = Color3.new(0, 0, 0);
-    Font = Font.new("rbxasset://fonts/families/Silkscreen.json"),
+    Font = Font.new("rbxassetid://12187371840"),
 
     OpenedFrames = {};
     DependencyBoxes = {};
