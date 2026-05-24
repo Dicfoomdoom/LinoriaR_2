@@ -32,12 +32,12 @@ local Library = {
 
     HudRegistry = {};
 
-    Library.FontColor       = Color3.fromRGB(180, 210, 255);
-    Library.MainColor       = Color3.fromRGB(8,   18,  40);
-    Library.BackgroundColor = Color3.fromRGB(4,   10,  24);
-    Library.AccentColor     = Color3.fromRGB(50,  120, 255);
-    Library.OutlineColor    = Color3.fromRGB(25,  50,  100);
-    Library.RiskColor       = Color3.fromRGB(255, 70,  70);
+    FontColor       = Color3.fromRGB(180, 210, 255);
+    MainColor       = Color3.fromRGB(8,   18,  40);
+    BackgroundColor = Color3.fromRGB(4,   10,  24);
+    AccentColor     = Color3.fromRGB(50,  120, 255);
+    OutlineColor    = Color3.fromRGB(25,  50,  100);
+    RiskColor       = Color3.fromRGB(255, 70,  70);
 
     Black = Color3.new(0, 0, 0);
     Font = Font.new("rbxassetid://12187371840", Enum.FontWeight.Regular),
@@ -47,7 +47,7 @@ local Library = {
 
     Signals = {};
     ScreenGui = ScreenGui;
-};
+}
 
 local RainbowStep = 0
 local Hue = 0
