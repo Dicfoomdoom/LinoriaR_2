@@ -5,6 +5,8 @@ local Teams = game:GetService('Teams');
 local Players = game:GetService('Players');
 local RunService = game:GetService('RunService')
 local TweenService = game:GetService('TweenService');
+local ContentProvider = game:GetService("ContentProvider")
+ContentProvider:PreloadAsync({"rbxassetid://12187371840"})
 local RenderStepped = RunService.RenderStepped;
 local LocalPlayer = Players.LocalPlayer;
 local Mouse = LocalPlayer:GetMouse();
@@ -37,7 +39,7 @@ local Library = {
     RiskColor       = Color3.fromRGB(255, 50,  50);
 
     Black = Color3.new(0, 0, 0);
-    Font = Font.new("rbxassetid://12187371840", Enum.FontWeight.Regular),
+    Font = Font.new("rbxasset://fonts/families/Silkscreen.json"),
 
     OpenedFrames = {};
     DependencyBoxes = {};
