@@ -2893,6 +2893,22 @@ function Library:Notify(Text, Time)
         Parent = NotifyInner,
     })
 
+    -- Gradient glow on background (accent tint fading left -> transparent)
+    Library:Create('UIGradient', {
+        Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0,   Library.AccentColor);
+            ColorSequenceKeypoint.new(0.6, Library.MainColor);
+            ColorSequenceKeypoint.new(1,   Library.MainColor);
+        });
+        Transparency = NumberSequence.new({
+            NumberSequenceKeypoint.new(0,   0.72);
+            NumberSequenceKeypoint.new(0.6, 1);
+            NumberSequenceKeypoint.new(1,   1);
+        });
+        Rotation = 0;
+        Parent = InnerFrame;
+    });
+
     local NotifyLabel = Library:CreateLabel({
         Position = UDim2.new(0, ACCENT_W + 4, 0, 0),
         Size = UDim2.new(1, -(ACCENT_W + 8), 1, 0),
@@ -2905,6 +2921,7 @@ function Library:Notify(Text, Time)
         Parent = InnerFrame,
     })
 
+    -- Left accent bar with vertical gradient
     local LeftColor = Library:Create('Frame', {
         BackgroundColor3 = Library.AccentColor,
         BorderSizePixel = 0,
@@ -2914,11 +2931,24 @@ function Library:Notify(Text, Time)
         Parent = InnerFrame,
     })
 
+    Library:Create('UIGradient', {
+        Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0,   Color3.new(1, 1, 1));   -- lighter top
+            ColorSequenceKeypoint.new(1,   Color3.fromRGB(80, 80, 80)); -- dimmer bottom
+        });
+        Transparency = NumberSequence.new({
+            NumberSequenceKeypoint.new(0, 0);
+            NumberSequenceKeypoint.new(1, 0);
+        });
+        Rotation = 90;
+        Parent = LeftColor;
+    });
+
     Library:AddToRegistry(LeftColor, {
         BackgroundColor3 = 'AccentColor',
     }, true)
 
-    -- slide in слева
+    -- slide in from left
     TweenService:Create(NotifyInner, TweenInfo.new(0.35, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
         Position = UDim2.fromOffset(0, 0),
     }):Play()
@@ -2926,7 +2956,7 @@ function Library:Notify(Text, Time)
     task.spawn(function()
         task.wait(Duration)
 
-        -- slide out вправо
+        -- slide out to right
         TweenService:Create(NotifyInner, TweenInfo.new(0.25, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {
             Position = UDim2.fromOffset(notifyW, 0),
         }):Play()
