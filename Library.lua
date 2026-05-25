@@ -2893,15 +2893,6 @@ function Library:Notify(Text, Time)
         Parent = NotifyInner,
     })
 
-    Library:AddToRegistry(Gradient, {
-        Color = function()
-            return ColorSequence.new({
-                ColorSequenceKeypoint.new(0, Library:GetDarkerColor(Library.MainColor)),
-                ColorSequenceKeypoint.new(1, Library.MainColor),
-            })
-        end
-    })
-
     local NotifyLabel = Library:CreateLabel({
         Position = UDim2.new(0, ACCENT_W + 4, 0, 0),
         Size = UDim2.new(1, -(ACCENT_W + 8), 1, 0),
