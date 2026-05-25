@@ -32,12 +32,12 @@ local Library = {
 
     HudRegistry = {};
 
-    FontColor       = Color3.fromRGB(180, 210, 255);
-    MainColor       = Color3.fromRGB(8,   18,  40);
-    BackgroundColor = Color3.fromRGB(4,   10,  24);
-    AccentColor     = Color3.fromRGB(50,  120, 255);
-    OutlineColor    = Color3.fromRGB(25,  50,  100);
-    RiskColor       = Color3.fromRGB(255, 70,  70);
+    FontColor = Color3.fromRGB(200, 180, 255);
+    MainColor = Color3.fromRGB(12, 8, 20);
+    BackgroundColor = Color3.fromRGB(6, 4, 12);
+    AccentColor = Color3.fromRGB(120, 60, 255);
+    OutlineColor = Color3.fromRGB(40, 20, 80);
+    RiskColor = Color3.fromRGB(255, 70, 70);
 
     Black = Color3.new(0, 0, 0);
     Font = Font.new("rbxassetid://12187371840", Enum.FontWeight.Regular),
@@ -2893,7 +2893,6 @@ function Library:Notify(Text, Time)
         Parent = NotifyInner,
     })
 
-    -- Gradient glow on background (accent tint fading left -> transparent)
     Library:Create('UIGradient', {
         Color = ColorSequence.new({
             ColorSequenceKeypoint.new(0,   Library.AccentColor);
@@ -2921,7 +2920,6 @@ function Library:Notify(Text, Time)
         Parent = InnerFrame,
     })
 
-    -- Left accent bar with vertical gradient
     local LeftColor = Library:Create('Frame', {
         BackgroundColor3 = Library.AccentColor,
         BorderSizePixel = 0,
@@ -2933,8 +2931,8 @@ function Library:Notify(Text, Time)
 
     Library:Create('UIGradient', {
         Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0,   Color3.new(1, 1, 1));   -- lighter top
-            ColorSequenceKeypoint.new(1,   Color3.fromRGB(80, 80, 80)); -- dimmer bottom
+            ColorSequenceKeypoint.new(0,   Color3.new(1, 1, 1));
+            ColorSequenceKeypoint.new(1,   Color3.fromRGB(80, 80, 80));
         });
         Transparency = NumberSequence.new({
             NumberSequenceKeypoint.new(0, 0);
@@ -2948,7 +2946,6 @@ function Library:Notify(Text, Time)
         BackgroundColor3 = 'AccentColor',
     }, true)
 
-    -- slide in from left
     TweenService:Create(NotifyInner, TweenInfo.new(0.35, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
         Position = UDim2.fromOffset(0, 0),
     }):Play()
