@@ -24,29 +24,6 @@ local Options = {};
 getgenv().Toggles = Toggles;
 getgenv().Options = Options;
 
-local Library = {
-    Registry = {};
-    RegistryMap = {};
-
-    HudRegistry = {};
-
-    FontColor = Color3.fromRGB(255, 255, 255);
-    MainColor = Color3.fromRGB(28, 28, 28);
-    BackgroundColor = Color3.fromRGB(20, 20, 20);
-    AccentColor = Color3.fromRGB(0, 85, 255);
-    OutlineColor = Color3.fromRGB(50, 50, 50);
-    RiskColor = Color3.fromRGB(255, 50, 50),
-
-    Black = Color3.new(0, 0, 0);
-    Font = Enum.Font.Code,
-
-    OpenedFrames = {};
-    DependencyBoxes = {};
-
-    Signals = {};
-    ScreenGui = ScreenGui;
-};
-
 local function GetCustomFont()
     local ttfName = "pixel.ttf"
     local fontConfigName = "pixel.font"
@@ -90,7 +67,34 @@ local function GetCustomFont()
     end
 end
 
+-- 1. Define your CustomFont first (keep this above the Library table)
 local CustomFont = GetCustomFont()
+
+-- 2. Define the Library table and assign CustomFont to the Font key
+local Library = {
+    Registry = {};
+    RegistryMap = {};
+
+    HudRegistry = {};
+
+    FontColor = Color3.fromRGB(255, 255, 255);
+    MainColor = Color3.fromRGB(28, 28, 28);
+    BackgroundColor = Color3.fromRGB(20, 20, 20);
+    AccentColor = Color3.fromRGB(0, 85, 255);
+    OutlineColor = Color3.fromRGB(50, 50, 50);
+    RiskColor = Color3.fromRGB(255, 50, 50); -- Fixed a minor comma typo here
+
+    Black = Color3.new(0, 0, 0);
+    
+    -- Assign your FontFace object here:
+    Font = CustomFont;
+
+    OpenedFrames = {};
+    DependencyBoxes = {};
+
+    Signals = {};
+    ScreenGui = ScreenGui;
+};
 
 local RainbowStep = 0
 local Hue = 0
