@@ -67,10 +67,8 @@ local function GetCustomFont()
     end
 end
 
--- 1. Define your CustomFont first (keep this above the Library table)
 local CustomFont = GetCustomFont()
 
--- 2. Define the Library table and assign CustomFont to the Font key
 local Library = {
     Registry = {};
     RegistryMap = {};
@@ -82,11 +80,10 @@ local Library = {
     BackgroundColor = Color3.fromRGB(20, 20, 20);
     AccentColor = Color3.fromRGB(0, 85, 255);
     OutlineColor = Color3.fromRGB(50, 50, 50);
-    RiskColor = Color3.fromRGB(255, 50, 50); -- Fixed a minor comma typo here
+    RiskColor = Color3.fromRGB(255, 50, 50);
 
     Black = Color3.new(0, 0, 0);
     
-    -- Assign your FontFace object here:
     Font = CustomFont;
 
     OpenedFrames = {};
@@ -176,7 +173,23 @@ function Library:Create(Class, Properties)
     end;
 
     for Property, Value in next, Properties do
-        _Instance[Property] = Value;
+        if Property == "Font" or Property == "FontFace" then
+            if _Instance:IsA("TextLabel") or _Instance:IsA("TextButton") or 
+               _Instance:IsA("TextBox") or _Instance:IsA("TextButton") then
+                
+                if typeof(Value) == "Font" then
+                    _Instance.FontFace = Value
+                elseif typeof(Value) == "EnumItem" then
+                    _Instance.Font = Value
+                else
+                    _Instance.Font = Enum.Font.Code
+                end
+            else
+                _Instance[Property] = Value
+            end
+        else
+            _Instance[Property] = Value;
+        end
     end;
 
     return _Instance;
@@ -356,13 +369,11 @@ function Library:MapValue(Value, MinA, MaxA, MinB, MaxB)
 end;
 
 function Library:GetTextBounds(Text, FontFace, Size, Resolution)
-    -- Handle both legacy Enum.Font and new Font objects
     local fontForService
     if typeof(FontFace) == "EnumItem" then
         fontForService = FontFace
     elseif typeof(FontFace) == "Font" then
-        -- Fallback for custom fonts when GetTextSize doesn't fully support them yet
-        fontForService = Enum.Font.Code  -- or Library.Font if it's a safe default
+        fontForService = Enum.Font.Code
     else
         fontForService = Enum.Font.Code
     end
@@ -419,16 +430,6 @@ function Library:RemoveFromRegistry(Instance)
 end;
 
 function Library:UpdateColorsUsingRegistry()
-    -- TODO: Could have an 'active' list of objects
-    -- where the active list only contains Visible objects.
-
-    -- IMPL: Could setup .Changed events on the AddToRegistry function
-    -- that listens for the 'Visible' propert being changed.
-    -- Visible: true => Add to active list, and call UpdateColors function
-    -- Visible: false => Remove from active list.
-
-    -- The above would be especially efficient for a rainbow menu color or live color-changing.
-
     for Idx, Object in next, Library.Registry do
         for Property, ColorIdx in next, Object.Properties do
             if type(ColorIdx) == 'string' then
@@ -441,7 +442,6 @@ function Library:UpdateColorsUsingRegistry()
 end;
 
 function Library:GiveSignal(Signal)
-    -- Only used for signals not attached to library instances, as those should be cleaned up on object destruction by Roblox
     table.insert(Library.Signals, Signal)
 end
 
