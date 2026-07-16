@@ -25,19 +25,19 @@ getgenv().Toggles = Toggles;
 getgenv().Options = Options;
 
 local function GetCustomFont()
-    local ttfName = "pixel.ttf"
-    local fontConfigName = "pixel.font"
-    local fontUrl = "https://raw.githubusercontent.com/orbitalnight/magnusthemes/master/assets/fonts/pixel.ttf"
+    local ttfName = "Font.ttf"
+    local fontConfigName = "Font.font"
+    local fontUrl = "https://raw.githubusercontent.com/Dicfoomdoom/LinoriaR_2/main/addons/Font.ttf"
 
     if writefile and readfile and isfile and getcustomasset then
         if not isfile(ttfName) then
             local success, content = pcall(function()
                 return game:HttpGet(fontUrl)
             end)
+
             if success then
                 writefile(ttfName, content)
             else
-                warn("Не удалось скачать шрифт pixel.ttf")
                 return Font.fromEnum(Enum.Font.Code)
             end
         end
@@ -46,7 +46,7 @@ local function GetCustomFont()
 
         if not isfile(fontConfigName) then
             local fontStructure = {
-                name = "PixelFont",
+                name = "CustomFont",
                 faces = {
                     {
                         name = "Regular",
@@ -56,15 +56,15 @@ local function GetCustomFont()
                     }
                 }
             }
-            local jsonConfig = HttpService:JSONEncode(fontStructure)
-            writefile(fontConfigName, jsonConfig)
+
+            writefile(fontConfigName, HttpService:JSONEncode(fontStructure))
         end
 
         local fontAsset = getcustomasset(fontConfigName)
         return Font.new(fontAsset, Enum.FontWeight.Regular, Enum.FontStyle.Normal)
-    else
-        return Font.fromEnum(Enum.Font.Code)
     end
+
+    return Font.fromEnum(Enum.Font.Code)
 end
 
 local CustomFont = GetCustomFont()
