@@ -44,6 +44,10 @@ local function GetCustomFont()
 
         local ttfAsset = getcustomasset(ttfName)
 
+        if isfile(fontConfigName) then
+            delfile(fontConfigName)
+        end
+
         if not isfile(fontConfigName) then
             local fontStructure = {
                 name = "CustomFont",
@@ -54,7 +58,8 @@ local function GetCustomFont()
                         style = "normal",
                         assetId = ttfAsset
                     }
-                }
+                },
+                fallbacks = {}
             }
 
             writefile(fontConfigName, HttpService:JSONEncode(fontStructure))
@@ -72,23 +77,18 @@ local CustomFont = GetCustomFont()
 local Library = {
     Registry = {};
     RegistryMap = {};
-
     HudRegistry = {};
-
-    FontColor = Color3.fromRGB(255, 255, 255);
-    MainColor = Color3.fromRGB(28, 28, 28);
-    BackgroundColor = Color3.fromRGB(20, 20, 20);
-    AccentColor = Color3.fromRGB(0, 85, 255);
-    OutlineColor = Color3.fromRGB(50, 50, 50);
-    RiskColor = Color3.fromRGB(255, 50, 50);
-
+    FontColor = Color3.fromRGB(230, 230, 230);
+    MainColor = Color3.fromRGB(24, 24, 24);
+    BackgroundColor = Color3.fromRGB(15, 15, 15);
+    AccentColor = Color3.fromRGB(120, 120, 120);
+    OutlineColor = Color3.fromRGB(45, 45, 45);
+    RiskColor = Color3.fromRGB(90, 90, 90);
     Black = Color3.new(0, 0, 0);
     
     Font = CustomFont;
-
     OpenedFrames = {};
     DependencyBoxes = {};
-
     Signals = {};
     ScreenGui = ScreenGui;
 };
@@ -368,23 +368,27 @@ function Library:MapValue(Value, MinA, MaxA, MinB, MaxB)
     return (1 - ((Value - MinA) / (MaxA - MinA))) * MinB + ((Value - MinA) / (MaxA - MinA)) * MaxB;
 end;
 
+local BoundsLabel = Instance.new("TextLabel")
+BoundsLabel.Visible = false
+BoundsLabel.RichText = false
+BoundsLabel.TextWrapped = false
+BoundsLabel.Size = UDim2.new(0, 0, 0, 0)
+BoundsLabel.Parent = Library.ScreenGui
+
 function Library:GetTextBounds(Text, FontFace, Size, Resolution)
-    local fontForService
-    if typeof(FontFace) == "EnumItem" then
-        fontForService = FontFace
-    elseif typeof(FontFace) == "Font" then
-        fontForService = Enum.Font.Code
+    BoundsLabel.Text = Text
+    BoundsLabel.TextSize = Size
+
+    if typeof(FontFace) == "Font" then
+        BoundsLabel.FontFace = FontFace
+    elseif typeof(FontFace) == "EnumItem" then
+        BoundsLabel.Font = FontFace
     else
-        fontForService = Enum.Font.Code
+        BoundsLabel.Font = Enum.Font.Code
     end
 
-    local Bounds = TextService:GetTextSize(
-        Text, 
-        Size, 
-        fontForService, 
-        Resolution or Vector2.new(1920, 1080)
-    )
-    return Bounds.X, Bounds.Y
+    local bounds = BoundsLabel.TextBounds
+    return bounds.X, bounds.Y
 end
 
 function Library:GetDarkerColor(Color)
@@ -650,11 +654,11 @@ do
             Parent = HueBoxInner;
         });
 
-        local HueBox = Library:Create('TextBox', {
+         local HueBox = Library:Create('TextBox', {
             BackgroundTransparency = 1;
             Position = UDim2.new(0, 5, 0, 0);
             Size = UDim2.new(1, -5, 1, 0);
-            Font = Library.Font;
+            FontFace = Library.Font;
             PlaceholderColor3 = Color3.fromRGB(190, 190, 190);
             PlaceholderText = 'Hex color',
             Text = '#FFFFFF',
@@ -1777,7 +1781,7 @@ do
             Position = UDim2.fromOffset(0, 0),
             Size = UDim2.fromScale(5, 1),
 
-            Font = Library.Font;
+            FontFace = Library.Font;
             PlaceholderColor3 = Color3.fromRGB(190, 190, 190);
             PlaceholderText = Info.Placeholder or '';
 
@@ -1841,7 +1845,7 @@ do
                 if cursor ~= -1 then
                     -- calculate pixel width of text from start to cursor
                     local subtext = string.sub(Box.Text, 1, cursor-1)
-                    local width = TextService:GetTextSize(subtext, Box.TextSize, Box.Font, Vector2.new(math.huge, math.huge)).X
+                    local width = select(1, Library:GetTextBounds(subtext, Box.FontFace, Box.TextSize))
 
                     -- check if we're inside the box with the cursor
                     local currentCursorPos = Box.Position.X.Offset + width
