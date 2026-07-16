@@ -372,6 +372,9 @@ local BoundsLabel = Instance.new("TextLabel")
 BoundsLabel.Visible = false
 BoundsLabel.RichText = false
 BoundsLabel.TextWrapped = false
+BoundsLabel.AnchorPoint = Vector2.new(0, 0)
+BoundsLabel.Position = UDim2.fromOffset(-9999, -9999)
+BoundsLabel.BackgroundTransparency = 1
 BoundsLabel.Size = UDim2.new(0, 0, 0, 0)
 BoundsLabel.Parent = Library.ScreenGui
 
@@ -388,6 +391,7 @@ function Library:GetTextBounds(Text, FontFace, Size, Resolution)
     end
 
     local bounds = BoundsLabel.TextBounds
+
     return bounds.X, bounds.Y
 end
 
