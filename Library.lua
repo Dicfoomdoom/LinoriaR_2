@@ -3283,55 +3283,32 @@ function Library:CreateWindow(...)
                 BackgroundColor3 = 'BackgroundColor';
             });
 
-            -- Текст заголовка сначала, чтобы посчитать его ширину
-            local TitleWidth = select(1, Library:GetTextBounds(Info.Name, Library.Font, 14))
-
-            local LeftLine = Library:Create('Frame', {
+            local Highlight = Library:Create('Frame', {
                 BackgroundColor3 = Library.AccentColor;
                 BorderSizePixel = 0;
-                Position = UDim2.new(0, 0, 0, 0);
-                Size = UDim2.new(0, 6, 0, 2);
+                Size = UDim2.new(1, 0, 0, 2);
                 ZIndex = 5;
                 Parent = BoxInner;
             });
 
-            local RightLine = Library:Create('Frame', {
-                BackgroundColor3 = Library.AccentColor;
-                BorderSizePixel = 0;
-                Position = UDim2.new(0, 6 + TitleWidth + 8, 0, 0);
-                Size = UDim2.new(1, -(6 + TitleWidth + 8), 0, 2);
-                ZIndex = 5;
-                Parent = BoxInner;
-            });
-
-            Library:AddToRegistry(LeftLine, {
-                BackgroundColor3 = 'AccentColor';
-            });
-
-            Library:AddToRegistry(RightLine, {
+            Library:AddToRegistry(Highlight, {
                 BackgroundColor3 = 'AccentColor';
             });
 
             local GroupboxLabel = Library:CreateLabel({
-                Size = UDim2.new(0, TitleWidth, 0, 14);
-                Position = UDim2.new(0, 6 + 4, 0, -6);
+                Size = UDim2.new(1, 0, 0, 18);
+                Position = UDim2.new(0, 4, 0, 2);
                 TextSize = 14;
                 Text = Info.Name;
                 TextXAlignment = Enum.TextXAlignment.Left;
-                BackgroundColor3 = Library.BackgroundColor;
-                BackgroundTransparency = 0;
-                ZIndex = 6;
+                ZIndex = 5;
                 Parent = BoxInner;
-            });
-
-            Library:AddToRegistry(GroupboxLabel, {
-                BackgroundColor3 = 'BackgroundColor';
             });
 
             local Container = Library:Create('Frame', {
                 BackgroundTransparency = 1;
-                Position = UDim2.new(0, 4, 0, 14);
-                Size = UDim2.new(1, -4, 1, -14);
+                Position = UDim2.new(0, 4, 0, 20);
+                Size = UDim2.new(1, -4, 1, -20);
                 ZIndex = 1;
                 Parent = BoxInner;
             });
@@ -3351,7 +3328,7 @@ function Library:CreateWindow(...)
                     end;
                 end;
 
-                BoxOuter.Size = UDim2.new(1, 0, 0, 14 + Size + 2 + 2);
+                BoxOuter.Size = UDim2.new(1, 0, 0, 20 + Size + 2 + 2);
             end;
 
             Groupbox.Container = Container;
