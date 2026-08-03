@@ -54,7 +54,6 @@ local SaveManager = {} do
 				end
 			end,
 		},
-
 		Input = {
 			Save = function(idx, object)
 				return { type = 'Input', idx = idx, text = object.Value }
@@ -91,14 +90,12 @@ local SaveManager = {} do
 
 		for idx, toggle in next, Toggles do
 			if self.Ignore[idx] then continue end
-
 			table.insert(data.objects, self.Parser[toggle.Type].Save(idx, toggle))
 		end
 
 		for idx, option in next, Options do
 			if not self.Parser[option.Type] then continue end
 			if self.Ignore[idx] then continue end
-
 			table.insert(data.objects, self.Parser[option.Type].Save(idx, option))
 		end	
 
@@ -124,17 +121,65 @@ local SaveManager = {} do
 
 		for _, option in next, decoded.objects do
 			if self.Parser[option.type] then
-				task.spawn(function() self.Parser[option.type].Load(option.idx, option) end) -- task.spawn() so the config loading wont get stuck.
+				task.spawn(function() self.Parser[option.type].Load(option.idx, option) end)
 			end
 		end
 
 		return true
 	end
 
+	function SaveManager:Delete(name)
+		if not name or name == '' then
+			return false, 'no config file is selected'
+		end
+
+		local fullPath = self.Folder .. '/settings/' .. name .. '.json'
+		if not isfile(fullPath) then
+			return false, 'config does not exist'
+		end
+
+		local autoloadPath = self.Folder .. '/settings/autoload.txt'
+		if isfile(autoloadPath) then
+			local autoloadName = readfile(autoloadPath)
+			if autoloadName == name then
+				delfile(autoloadPath)
+				if SaveManager.AutoloadLabel then
+					SaveManager.AutoloadLabel:SetText('Current autoload config: none')
+				end
+			end
+		end
+
+		delfile(fullPath)
+		return true
+	end
+
+	function SaveManager:Duplicate(name)
+		if not name or name == '' then
+			return false, 'no config selected to duplicate'
+		end
+
+		local srcPath = self.Folder .. '/settings/' .. name .. '.json'
+		if not isfile(srcPath) then
+			return false, 'source config does not exist'
+		end
+
+		local raw = readfile(srcPath)
+		local copyName = name .. '_copy'
+		local attempt = 0
+
+		while isfile(self.Folder .. '/settings/' .. copyName .. '.json') do
+			attempt = attempt + 1
+			copyName = name .. '_copy' .. attempt
+		end
+
+		writefile(self.Folder .. '/settings/' .. copyName .. '.json', raw)
+		return true, copyName
+	end
+
 	function SaveManager:IgnoreThemeSettings()
 		self:SetIgnoreIndexes({ 
-			"BackgroundColor", "MainColor", "AccentColor", "OutlineColor", "FontColor", -- themes
-			"ThemeManager_ThemeList", 'ThemeManager_CustomThemeList', 'ThemeManager_CustomThemeName', -- themes
+			"BackgroundColor", "MainColor", "AccentColor", "OutlineColor", "FontColor",
+			"ThemeManager_ThemeList", 'ThemeManager_CustomThemeList', 'ThemeManager_CustomThemeName',
 		})
 	end
 
@@ -160,8 +205,6 @@ local SaveManager = {} do
 		for i = 1, #list do
 			local file = list[i]
 			if file:sub(-5) == '.json' then
-				-- i hate this but it has to be done ...
-
 				local pos = file:find('.json', 1, true)
 				local start = pos
 
@@ -196,7 +239,6 @@ local SaveManager = {} do
 			self.Library:Notify(string.format('Auto loaded config %q', name))
 		end
 	end
-
 
 	function SaveManager:BuildConfigSection(tab)
 		assert(self.Library, 'Must set SaveManager.Library')
@@ -244,6 +286,36 @@ local SaveManager = {} do
 			end
 
 			self.Library:Notify(string.format('Overwrote config %q', name))
+		end):AddButton('Delete config', function()
+			local name = Options.SaveManager_ConfigList.Value
+
+			if not name or name == '' then
+				return self.Library:Notify('No config selected', 2)
+			end
+
+			local success, err = self:Delete(name)
+			if not success then
+				return self.Library:Notify('Failed to delete config: ' .. err)
+			end
+
+			self.Library:Notify(string.format('Deleted config %q', name))
+
+			Options.SaveManager_ConfigList:SetValues(self:RefreshConfigList())
+			Options.SaveManager_ConfigList:SetValue(nil)
+		end)
+
+		section:AddButton('Duplicate config', function()
+			local name = Options.SaveManager_ConfigList.Value
+
+			local success, copyName = self:Duplicate(name)
+			if not success then
+				return self.Library:Notify('Failed to duplicate: ' .. copyName)
+			end
+
+			self.Library:Notify(string.format('Duplicated as %q', copyName))
+
+			Options.SaveManager_ConfigList:SetValues(self:RefreshConfigList())
+			Options.SaveManager_ConfigList:SetValue(copyName)
 		end)
 
 		section:AddButton('Refresh list', function()
