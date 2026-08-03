@@ -72,20 +72,27 @@ local function GetCustomFont()
     return Font.fromEnum(Enum.Font.Code)
 end
 
+local FontReady = false
 local CustomFont = GetCustomFont()
+
+task.defer(function()
+    RunService.Heartbeat:Wait()
+    RunService.Heartbeat:Wait()
+    FontReady = true
+end)
 
 local Library = {
     Registry = {};
     RegistryMap = {};
     HudRegistry = {};
-    FontColor = Color3.fromRGB(230, 230, 230);
-    MainColor = Color3.fromRGB(24, 24, 24);
-    BackgroundColor = Color3.fromRGB(15, 15, 15);
-    AccentColor = Color3.fromRGB(120, 120, 120);
-    OutlineColor = Color3.fromRGB(45, 45, 45);
-    RiskColor = Color3.fromRGB(90, 90, 90);
+    FontColor = Color3.fromRGB(255, 255, 255);
+    MainColor = Color3.fromRGB(8, 8, 8);
+    BackgroundColor = Color3.fromRGB(0, 0, 0);
+    AccentColor = Color3.fromRGB(255, 255, 255);
+    OutlineColor = Color3.fromRGB(25, 25, 25);
+    RiskColor = Color3.fromRGB(200, 40, 40);
     Black = Color3.new(0, 0, 0);
-    
+
     Font = CustomFont;
     OpenedFrames = {};
     DependencyBoxes = {};
@@ -379,6 +386,11 @@ BoundsLabel.Size = UDim2.new(0, 0, 0, 0)
 BoundsLabel.Parent = Library.ScreenGui
 
 function Library:GetTextBounds(Text, FontFace, Size, Resolution)
+    if not FontReady then
+        RunService.Heartbeat:Wait()
+        RunService.Heartbeat:Wait()
+    end
+
     BoundsLabel.Text = Text
     BoundsLabel.TextSize = Size
 
@@ -390,9 +402,7 @@ function Library:GetTextBounds(Text, FontFace, Size, Resolution)
         BoundsLabel.Font = Enum.Font.Code
     end
 
-    local bounds = BoundsLabel.TextBounds
-
-    return bounds.X, bounds.Y
+    return BoundsLabel.TextBounds.X, BoundsLabel.TextBounds.Y
 end
 
 function Library:GetDarkerColor(Color)
