@@ -27,7 +27,7 @@ getgenv().Options = Options;
 local function GetCustomFont()
     local ttfName = "Font.ttf"
     local fontConfigName = "Font.font"
-    local fontUrl = "https://raw.githubusercontent.com/Dicfoomdoom/LinoriaR_2/main/addons/Font.ttf"
+    local fontUrl = "https://raw.githubusercontent.com/Dicfoomdoom/LinoriaR_2/main/addons/PB.ttf"
 
     if writefile and readfile and isfile and getcustomasset then
         if not isfile(ttfName) then
