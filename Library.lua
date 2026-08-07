@@ -25,9 +25,9 @@ getgenv().Toggles = Toggles;
 getgenv().Options = Options;
 
 local function GetCustomFont()
-    local ttfName = "Font.ttf"
-    local fontConfigName = "Font.font"
-    local fontUrl = "https://raw.githubusercontent.com/Dicfoomdoom/LinoriaR_2/main/addons/PB.ttf"
+    local ttfName = "m.ttf"
+    local fontConfigName = "m.font"
+    local fontUrl = "https://raw.githubusercontent.com/Dicfoomdoom/LinoriaR_2/main/addons/minecraft.ttf"
 
     if writefile and readfile and isfile and getcustomasset then
         if not isfile(ttfName) then
@@ -43,13 +43,12 @@ local function GetCustomFont()
 
         local ttfAsset = getcustomasset(ttfName)
 
-        -- Always nuke and rebuild the font config so getcustomasset gets a fresh handle
         if isfile(fontConfigName) then
             delfile(fontConfigName)
         end
 
         local fontStructure = {
-            name = "CustomFont",
+            name = "minecraft",
             faces = {
                 {
                     name = "Regular",
