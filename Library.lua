@@ -34,7 +34,6 @@ local function GetCustomFont()
             local success, content = pcall(function()
                 return game:HttpGet(fontUrl)
             end)
-
             if success then
                 writefile(ttfName, content)
             else
@@ -44,26 +43,24 @@ local function GetCustomFont()
 
         local ttfAsset = getcustomasset(ttfName)
 
+        -- Always nuke and rebuild the font config so getcustomasset gets a fresh handle
         if isfile(fontConfigName) then
             delfile(fontConfigName)
         end
 
-        if not isfile(fontConfigName) then
-            local fontStructure = {
-                name = "CustomFont",
-                faces = {
-                    {
-                        name = "Regular",
-                        weight = 400,
-                        style = "normal",
-                        assetId = ttfAsset
-                    }
-                },
-                fallbacks = {}
-            }
-
-            writefile(fontConfigName, HttpService:JSONEncode(fontStructure))
-        end
+        local fontStructure = {
+            name = "CustomFont",
+            faces = {
+                {
+                    name = "Regular",
+                    weight = 400,
+                    style = "normal",
+                    assetId = ttfAsset
+                }
+            },
+            fallbacks = {}
+        }
+        writefile(fontConfigName, HttpService:JSONEncode(fontStructure))
 
         local fontAsset = getcustomasset(fontConfigName)
         return Font.new(fontAsset, Enum.FontWeight.Regular, Enum.FontStyle.Normal)
