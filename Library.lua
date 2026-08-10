@@ -77,24 +77,25 @@ task.defer(function()
     FontReady = true
 end)
 
-local Library = {
-    Registry = {};
-    RegistryMap = {};
-    HudRegistry = {};
-    FontColor = Color3.fromRGB(255, 255, 255);
-    MainColor = Color3.fromRGB(8, 8, 8);
-    BackgroundColor = Color3.fromRGB(0, 0, 0);
-    AccentColor = Color3.fromRGB(255, 255, 255);
-    OutlineColor = Color3.fromRGB(25, 25, 25);
-    RiskColor = Color3.fromRGB(200, 40, 40);
-    Black = Color3.new(0, 0, 0);
-
-    Font = CustomFont;
-    OpenedFrames = {};
-    DependencyBoxes = {};
-    Signals = {};
-    ScreenGui = ScreenGui;
+local Library = {     
+    Registry = {};     
+    RegistryMap = {};     
+    HudRegistry = {};     
+    FontColor = Color3.fromRGB(240, 240, 240);
+    MainColor = Color3.fromRGB(18, 18, 18);
+    BackgroundColor = Color3.fromRGB(12, 12, 12);
+    AccentColor = Color3.fromRGB(140, 140, 140);
+    OutlineColor = Color3.fromRGB(35, 35, 35);
+    RiskColor = Color3.fromRGB(220, 60, 60);
+    Black = Color3.fromRGB(5, 5, 5);
+    
+    Font = CustomFont;     
+    OpenedFrames = {};     
+    DependencyBoxes = {};     
+    Signals = {};     
+    ScreenGui = ScreenGui; 
 };
+
 
 local RainbowStep = 0
 local Hue = 0
