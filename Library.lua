@@ -199,15 +199,21 @@ function Library:Create(Class, Properties)
 end;
 
 function Library:ApplyTextStroke(Inst)
-    Inst.TextStrokeTransparency = 1;
+    Inst.TextStrokeTransparency = 1
 
-    Library:Create('UIStroke', {
+    local Stroke = Library:Create('UIStroke', {
         Color = Color3.new(0, 0, 0);
         Thickness = 1;
         LineJoinMode = Enum.LineJoinMode.Miter;
         Parent = Inst;
-    });
-end;
+    })
+
+    Library:AddToRegistry(Stroke, {
+        Color = Color3.new(0, 0, 0);
+    })
+
+    return Stroke
+end
 
 function Library:CreateLabel(Properties, IsHud)
     local _Instance = Library:Create('TextLabel', {
@@ -315,29 +321,33 @@ end
 
 function Library:OnHighlight(HighlightInstance, Instance, Properties, PropertiesDefault)
     HighlightInstance.MouseEnter:Connect(function()
-        local Reg = Library.RegistryMap[Instance];
+        local Reg = Library.RegistryMap[Instance]
 
         for Property, ColorIdx in next, Properties do
-            Instance[Property] = Library[ColorIdx] or ColorIdx;
+            if Instance:IsA('UIStroke') then break end
+
+            Instance[Property] = Library[ColorIdx] or ColorIdx
 
             if Reg and Reg.Properties[Property] then
-                Reg.Properties[Property] = ColorIdx;
-            end;
-        end;
+                Reg.Properties[Property] = ColorIdx
+            end
+        end
     end)
 
     HighlightInstance.MouseLeave:Connect(function()
-        local Reg = Library.RegistryMap[Instance];
+        local Reg = Library.RegistryMap[Instance]
 
         for Property, ColorIdx in next, PropertiesDefault do
-            Instance[Property] = Library[ColorIdx] or ColorIdx;
+            if Instance:IsA('UIStroke') then break end
+
+            Instance[Property] = Library[ColorIdx] or ColorIdx
 
             if Reg and Reg.Properties[Property] then
-                Reg.Properties[Property] = ColorIdx;
-            end;
-        end;
+                Reg.Properties[Property] = ColorIdx
+            end
+        end
     end)
-end;
+end
 
 function Library:MouseIsOverOpenedFrame()
     for Frame, _ in next, Library.OpenedFrames do
