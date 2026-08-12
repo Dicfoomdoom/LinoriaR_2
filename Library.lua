@@ -314,46 +314,43 @@ function Library:AddToolTip(InfoStr, HoverInstance)
 end
 
 function Library:OnHighlight(HighlightInstance, Instance, Properties, PropertiesDefault)
-    HighlightInstance.MouseEnter:Connect(function()
-        if Library:MouseIsOverOpenedFrame() then return end
+    local Hovering = false
+
+    Library:GiveSignal(RenderStepped:Connect(function()
+        local AbsPos  = HighlightInstance.AbsolutePosition
+        local AbsSize = HighlightInstance.AbsoluteSize
+
+        local Over = Mouse.X >= AbsPos.X and Mouse.X <= AbsPos.X + AbsSize.X
+                 and Mouse.Y >= AbsPos.Y and Mouse.Y <= AbsPos.Y + AbsSize.Y
+
+        if Over == Hovering then return end
+        Hovering = Over
 
         local Reg = Library.RegistryMap[Instance]
+        local Source = Over and Properties or nil
 
-        for Property, ColorIdx in next, Properties do
-            local Value = type(ColorIdx) == 'string' and (Library[ColorIdx] or ColorIdx) or ColorIdx
-            if typeof(Value) ~= 'Color3' then continue end
-
-            Instance[Property] = Value
-
-            if Reg and Reg.Properties[Property] then
-                Reg.Properties[Property] = ColorIdx
+        if Over then
+            for Property, ColorIdx in next, Properties do
+                local Value = type(ColorIdx) == 'string' and (Library[ColorIdx] or ColorIdx) or ColorIdx
+                if typeof(Value) ~= 'Color3' then continue end
+                Instance[Property] = Value
+                if Reg and Reg.Properties[Property] then
+                    Reg.Properties[Property] = ColorIdx
+                end
+            end
+        else
+            for Property, ColorIdx in next, PropertiesDefault do
+                local Reg = Library.RegistryMap[Instance]
+                local currentColor = (Reg and Reg.Properties[Property]) or ColorIdx
+                local resolved = type(currentColor) == 'string'
+                    and (Library[currentColor] or currentColor)
+                    or currentColor
+                if typeof(resolved) == 'Color3' then
+                    Instance[Property] = resolved
+                end
             end
         end
-    end)
-
-    HighlightInstance.MouseLeave:Connect(function()
-        local Reg = Library.RegistryMap[Instance]
-
-        for Property, ColorIdx in next, PropertiesDefault do
-            local Value = type(ColorIdx) == 'string' and (Library[ColorIdx] or ColorIdx) or ColorIdx
-            if typeof(Value) ~= 'Color3' then continue end
-
-            -- Read the CURRENT registry value, not the passed-in default.
-            -- If SetValue/Display changed the registry after hover started, respect that.
-            local currentRegistryColor = ColorIdx
-            if Reg and Reg.Properties[Property] then
-                currentRegistryColor = Reg.Properties[Property]
-            end
-
-            local resolvedValue = type(currentRegistryColor) == 'string'
-                and (Library[currentRegistryColor] or currentRegistryColor)
-                or currentRegistryColor
-
-            if typeof(resolvedValue) == 'Color3' then
-                Instance[Property] = resolvedValue
-            end
-        end
-    end)
+    end))
 end
 
 function Library:MouseIsOverOpenedFrame()
