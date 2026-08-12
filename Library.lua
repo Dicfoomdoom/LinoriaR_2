@@ -1967,8 +1967,8 @@ do
         });
 
         Library:OnHighlight(ToggleRegion, ToggleOuter,
-            { BorderColor3 = Toggle.Value and 'AccentColor' },
-            { BorderColor3 = Toggle.Value and 'AccentColor' }
+            { BorderColor3 = 'AccentColor' },
+            { BorderColor3 = 'Black' }
         );
 
         function Toggle:UpdateColors()
