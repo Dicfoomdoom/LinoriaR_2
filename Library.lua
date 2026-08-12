@@ -18,8 +18,6 @@ ProtectGui(ScreenGui);
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global;
 ScreenGui.Parent = CoreGui;
 
-ESPPreview = nil;
-
 local Toggles = {};
 local Options = {};
 
@@ -320,7 +318,10 @@ function Library:OnHighlight(HighlightInstance, Instance, Properties, Properties
         local Reg = Library.RegistryMap[Instance];
 
         for Property, ColorIdx in next, Properties do
-            Instance[Property] = Library[ColorIdx] or ColorIdx;
+            local Value = type(ColorIdx) == 'string' and (Library[ColorIdx] or ColorIdx) or ColorIdx
+            if typeof(Value) ~= 'Color3' then continue end
+
+            Instance[Property] = Value;
 
             if Reg and Reg.Properties[Property] then
                 Reg.Properties[Property] = ColorIdx;
@@ -332,7 +333,10 @@ function Library:OnHighlight(HighlightInstance, Instance, Properties, Properties
         local Reg = Library.RegistryMap[Instance];
 
         for Property, ColorIdx in next, PropertiesDefault do
-            Instance[Property] = Library[ColorIdx] or ColorIdx;
+            local Value = type(ColorIdx) == 'string' and (Library[ColorIdx] or ColorIdx) or ColorIdx
+            if typeof(Value) ~= 'Color3' then continue end
+
+            Instance[Property] = Value;
 
             if Reg and Reg.Properties[Property] then
                 Reg.Properties[Property] = ColorIdx;
