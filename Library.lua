@@ -2921,16 +2921,16 @@ function Library:CreateLoader(Config)
     }
 
     local LoaderOuter = Library:Create('Frame', {
-        AnchorPoint  = Config.Center and Vector2.new(0.5, 0.5) or Vector2.zero,
-        Position     = Config.Center and UDim2.fromScale(0.5, 0.5)
-                                      or UDim2.fromOffset(175, 50),
-        Size         = UDim2.fromOffset(440, 300),
-        BackgroundColor3 = Color3.new(0, 0, 0),
-        BorderSizePixel  = 0,
-        ZIndex       = 300,
-        Visible      = true,
-        Parent       = ScreenGui,
-    })
+    AnchorPoint  = Config.Center and Vector2.new(0.5, 0.5) or Vector2.zero,
+    Position     = Config.Center and UDim2.fromScale(0.5, 0.5)
+                                  or UDim2.fromOffset(175, 50),
+    Size         = UDim2.fromOffset(440, 180),  -- было 300, стало 180
+    BackgroundColor3 = Color3.new(0, 0, 0),
+    BorderSizePixel  = 0,
+    ZIndex       = 300,
+    Visible      = true,
+    Parent       = ScreenGui,
+})
 
     Library:MakeDraggable(LoaderOuter, 28)
 
@@ -2985,12 +2985,12 @@ function Library:CreateLoader(Config)
     })
 
     Library:Create('UIGridLayout', {
-        CellSize          = UDim2.fromOffset(196, 210),
-        CellPadding       = UDim2.fromOffset(8, 8),
-        HorizontalAlignment = Enum.HorizontalAlignment.Center,
-        SortOrder         = Enum.SortOrder.LayoutOrder,
-        Parent            = CardArea,
-    })
+    CellSize          = UDim2.fromOffset(196, 130),  -- было 210, стало 130
+    CellPadding       = UDim2.fromOffset(8, 8),
+    HorizontalAlignment = Enum.HorizontalAlignment.Center,
+    SortOrder         = Enum.SortOrder.LayoutOrder,
+    Parent            = CardArea,
+})
 
     local ProgressOverlay = Library:Create('Frame', {
         BackgroundColor3 = Library.BackgroundColor,
