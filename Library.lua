@@ -314,44 +314,30 @@ function Library:AddToolTip(InfoStr, HoverInstance)
 end
 
 function Library:OnHighlight(HighlightInstance, Instance, Properties, PropertiesDefault)
-    local Hovering = false
+    HighlightInstance.MouseEnter:Connect(function()
+        local Reg = Library.RegistryMap[Instance];
 
-    Library:GiveSignal(RenderStepped:Connect(function()
-        local AbsPos  = HighlightInstance.AbsolutePosition
-        local AbsSize = HighlightInstance.AbsoluteSize
+        for Property, ColorIdx in next, Properties do
+            Instance[Property] = Library[ColorIdx] or ColorIdx;
 
-        local Over = Mouse.X >= AbsPos.X and Mouse.X <= AbsPos.X + AbsSize.X
-                 and Mouse.Y >= AbsPos.Y and Mouse.Y <= AbsPos.Y + AbsSize.Y
+            if Reg and Reg.Properties[Property] then
+                Reg.Properties[Property] = ColorIdx;
+            end;
+        end;
+    end)
 
-        if Over == Hovering then return end
-        Hovering = Over
+    HighlightInstance.MouseLeave:Connect(function()
+        local Reg = Library.RegistryMap[Instance];
 
-        local Reg = Library.RegistryMap[Instance]
-        local Source = Over and Properties or nil
+        for Property, ColorIdx in next, PropertiesDefault do
+            Instance[Property] = Library[ColorIdx] or ColorIdx;
 
-        if Over then
-            for Property, ColorIdx in next, Properties do
-                local Value = type(ColorIdx) == 'string' and (Library[ColorIdx] or ColorIdx) or ColorIdx
-                if typeof(Value) ~= 'Color3' then continue end
-                Instance[Property] = Value
-                if Reg and Reg.Properties[Property] then
-                    Reg.Properties[Property] = ColorIdx
-                end
-            end
-        else
-            for Property, ColorIdx in next, PropertiesDefault do
-                local Reg = Library.RegistryMap[Instance]
-                local currentColor = (Reg and Reg.Properties[Property]) or ColorIdx
-                local resolved = type(currentColor) == 'string'
-                    and (Library[currentColor] or currentColor)
-                    or currentColor
-                if typeof(resolved) == 'Color3' then
-                    Instance[Property] = resolved
-                end
-            end
-        end
-    end))
-end
+            if Reg and Reg.Properties[Property] then
+                Reg.Properties[Property] = ColorIdx;
+            end;
+        end;
+    end)
+end;
 
 function Library:MouseIsOverOpenedFrame()
     for Frame, _ in next, Library.OpenedFrames do
@@ -1908,7 +1894,7 @@ do
         return Textbox;
     end;
 
-    function Funcs:AddToggle(Idx, Info)
+     function Funcs:AddToggle(Idx, Info)
         assert(Info.Text, 'AddInput: Missing `Text` string.')
 
         local Toggle = {
@@ -1952,7 +1938,7 @@ do
         local ToggleLabel = Library:CreateLabel({
             Size = UDim2.new(0, 216, 1, 0);
             Position = UDim2.new(1, 6, 0, 0);
-            TextSize = 10;
+            TextSize = 14;
             Text = Info.Text;
             TextXAlignment = Enum.TextXAlignment.Left;
             ZIndex = 6;
@@ -1975,7 +1961,7 @@ do
         });
 
         Library:OnHighlight(ToggleRegion, ToggleOuter,
-            { BorderColor3 = 'Black' },
+            { BorderColor3 = 'AccentColor' },
             { BorderColor3 = 'Black' }
         );
 
@@ -2001,26 +1987,22 @@ do
         end;
 
         function Toggle:SetValue(Bool)
-    Bool = (not not Bool);
+            Bool = (not not Bool);
 
-    Toggle.Value = Bool;
-    Toggle:Display();
+            Toggle.Value = Bool;
+            Toggle:Display();
 
-    -- Reset hover state so border doesn't stay lit after click
-    ToggleOuter.BorderColor3 = Toggle.Value and Library.AccentColorDark or Library.OutlineColor;
-    Library.RegistryMap[ToggleOuter].Properties.BorderColor3 = Toggle.Value and 'AccentColorDark' or 'OutlineColor';
+            for _, Addon in next, Toggle.Addons do
+                if Addon.Type == 'KeyPicker' and Addon.SyncToggleState then
+                    Addon.Toggled = Bool
+                    Addon:Update()
+                end
+            end
 
-    for _, Addon in next, Toggle.Addons do
-        if Addon.Type == 'KeyPicker' and Addon.SyncToggleState then
-            Addon.Toggled = Bool
-            Addon:Update()
-        end
-    end
-
-    Library:SafeCallback(Toggle.Callback, Toggle.Value);
-    Library:SafeCallback(Toggle.Changed, Toggle.Value);
-    Library:UpdateDependencyBoxes();
-end;
+            Library:SafeCallback(Toggle.Callback, Toggle.Value);
+            Library:SafeCallback(Toggle.Changed, Toggle.Value);
+            Library:UpdateDependencyBoxes();
+        end;
 
         ToggleRegion.InputBegan:Connect(function(Input)
             if Input.UserInputType == Enum.UserInputType.MouseButton1 and not Library:MouseIsOverOpenedFrame() then
@@ -2028,20 +2010,6 @@ end;
                 Library:AttemptSave();
             end;
         end);
-
-ToggleRegion.MouseEnter:Connect(function()
-    if not Library:MouseIsOverOpenedFrame() then
-        ToggleOuter.BorderColor3 = Library.AccentColor
-        -- Don't touch the registry here — it's a visual-only hover hint
-    end
-end)
-
-ToggleRegion.MouseLeave:Connect(function()
-    -- Respect current toggle state, not a hardcoded fallback
-    local correctColor = Toggle.Value and Library.AccentColorDark or Library.Black
-    ToggleOuter.BorderColor3 = correctColor
-    Library.RegistryMap[ToggleOuter].Properties.BorderColor3 = Toggle.Value and 'AccentColorDark' or 'Black'
-end)
 
         if Toggle.Risky then
             Library:RemoveFromRegistry(ToggleLabel)
