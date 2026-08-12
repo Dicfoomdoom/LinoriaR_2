@@ -2021,14 +2021,17 @@ end;
             end;
         end);
 
-        ToggleRegion.MouseEnter:Connect(function()
+ToggleRegion.MouseEnter:Connect(function()
     if not Library:MouseIsOverOpenedFrame() then
         ToggleOuter.BorderColor3 = Library.AccentColor
+        -- Don't touch the registry here — it's a visual-only hover hint
     end
 end)
 
 ToggleRegion.MouseLeave:Connect(function()
-    ToggleOuter.BorderColor3 = Toggle.Value and Library.AccentColorDark or Library.Black
+    -- Respect current toggle state, not a hardcoded fallback
+    local correctColor = Toggle.Value and Library.AccentColorDark or Library.Black
+    ToggleOuter.BorderColor3 = correctColor
     Library.RegistryMap[ToggleOuter].Properties.BorderColor3 = Toggle.Value and 'AccentColorDark' or 'Black'
 end)
 
