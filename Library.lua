@@ -1967,7 +1967,7 @@ do
         });
 
         Library:OnHighlight(ToggleRegion, ToggleOuter,
-            { BorderColor3 = 'AccentColor' },
+            { BorderColor3 = 'Black' },
             { BorderColor3 = 'Black' }
         );
 
