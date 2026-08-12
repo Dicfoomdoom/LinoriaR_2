@@ -2911,6 +2911,316 @@ do
     Library:MakeDraggable(KeybindOuter);
 end;
 
+function Library:CreateLoader(Config)
+    Config = Config or {}
+    if type(Config.Title) ~= 'string' then Config.Title = 'Select Game' end
+
+    local Loader = {
+        Choices   = {},
+        _pending  = nil,
+    }
+
+    local LoaderOuter = Library:Create('Frame', {
+        AnchorPoint  = Config.Center and Vector2.new(0.5, 0.5) or Vector2.zero,
+        Position     = Config.Center and UDim2.fromScale(0.5, 0.5)
+                                      or UDim2.fromOffset(175, 50),
+        Size         = UDim2.fromOffset(440, 300),
+        BackgroundColor3 = Color3.new(0, 0, 0),
+        BorderSizePixel  = 0,
+        ZIndex       = 300,
+        Visible      = true,
+        Parent       = ScreenGui,
+    })
+
+    Library:MakeDraggable(LoaderOuter, 28)
+
+    local LoaderInner = Library:Create('Frame', {
+        BackgroundColor3 = Library.MainColor,
+        BorderColor3     = Library.AccentColor,
+        BorderMode       = Enum.BorderMode.Inset,
+        Size             = UDim2.new(1, -2, 1, -2),
+        Position         = UDim2.fromOffset(1, 1),
+        ZIndex           = 301,
+        Parent           = LoaderOuter,
+    })
+
+    Library:AddToRegistry(LoaderInner, {
+        BackgroundColor3 = 'MainColor',
+        BorderColor3     = 'AccentColor',
+    })
+
+    Library:CreateLabel({
+        Position         = UDim2.fromOffset(7, 0),
+        Size             = UDim2.new(1, -7, 0, 26),
+        Text             = Config.Title,
+        TextXAlignment   = Enum.TextXAlignment.Left,
+        ZIndex           = 302,
+        Parent           = LoaderInner,
+    })
+
+    Library:Create('Frame', {
+        BackgroundColor3 = Library.AccentColor,
+        BorderSizePixel  = 0,
+        Position         = UDim2.fromOffset(0, 26),
+        Size             = UDim2.new(1, 0, 0, 2),
+        ZIndex           = 302,
+        Parent           = LoaderInner,
+    })
+
+    Library:AddToRegistry(Library:Create('Frame', {
+        BackgroundColor3 = Library.AccentColor,
+        BorderSizePixel  = 0,
+        Position         = UDim2.fromOffset(0, 26),
+        Size             = UDim2.new(1, 0, 0, 2),
+        ZIndex           = 302,
+        Parent           = LoaderInner,
+    }), { BackgroundColor3 = 'AccentColor' })
+
+    local CardArea = Library:Create('Frame', {
+        BackgroundTransparency = 1,
+        Position               = UDim2.fromOffset(8, 34),
+        Size                   = UDim2.new(1, -16, 1, -42),
+        ZIndex                 = 302,
+        Parent                 = LoaderInner,
+    })
+
+    Library:Create('UIGridLayout', {
+        CellSize          = UDim2.fromOffset(196, 210),
+        CellPadding       = UDim2.fromOffset(8, 8),
+        HorizontalAlignment = Enum.HorizontalAlignment.Center,
+        SortOrder         = Enum.SortOrder.LayoutOrder,
+        Parent            = CardArea,
+    })
+
+    local ProgressOverlay = Library:Create('Frame', {
+        BackgroundColor3 = Library.BackgroundColor,
+        BorderSizePixel  = 0,
+        Size             = UDim2.fromScale(1, 1),
+        ZIndex           = 310,
+        Visible          = false,
+        Parent           = LoaderInner,
+    })
+
+    Library:AddToRegistry(ProgressOverlay, { BackgroundColor3 = 'BackgroundColor' })
+
+    local ProgressLabel = Library:CreateLabel({
+        AnchorPoint      = Vector2.new(0.5, 0.5),
+        Position         = UDim2.fromScale(0.5, 0.42),
+        Size             = UDim2.fromOffset(300, 20),
+        Text             = 'Loading... 0%',
+        ZIndex           = 311,
+        Parent           = ProgressOverlay,
+    })
+
+    local BarOuter = Library:Create('Frame', {
+        AnchorPoint      = Vector2.new(0.5, 0.5),
+        BackgroundColor3 = Color3.new(0, 0, 0),
+        BorderColor3     = Color3.new(0, 0, 0),
+        Position         = UDim2.fromScale(0.5, 0.55),
+        Size             = UDim2.fromOffset(300, 14),
+        ZIndex           = 311,
+        Parent           = ProgressOverlay,
+    })
+
+    local BarInner = Library:Create('Frame', {
+        BackgroundColor3 = Library.MainColor,
+        BorderColor3     = Library.OutlineColor,
+        BorderMode       = Enum.BorderMode.Inset,
+        Size             = UDim2.fromScale(1, 1),
+        ZIndex           = 312,
+        Parent           = BarOuter,
+    })
+
+    Library:AddToRegistry(BarInner, {
+        BackgroundColor3 = 'MainColor',
+        BorderColor3     = 'OutlineColor',
+    })
+
+    local BarFill = Library:Create('Frame', {
+        BackgroundColor3 = Library.AccentColor,
+        BorderColor3     = Library.AccentColorDark,
+        Size             = UDim2.fromOffset(0, 14),
+        ZIndex           = 313,
+        Parent           = BarInner,
+    })
+
+    Library:AddToRegistry(BarFill, {
+        BackgroundColor3 = 'AccentColor',
+        BorderColor3     = 'AccentColorDark',
+    })
+
+    local function RunProgress(callback)
+        ProgressOverlay.Visible = true
+
+        local DURATION = 2.2
+        local STEPS    = 60 * DURATION
+        local elapsed  = 0
+
+        task.spawn(function()
+            for i = 1, STEPS do
+                elapsed = i / STEPS
+                local pct = math.floor(elapsed * 100)
+                ProgressLabel.Text = string.format('Loading... %d%%', pct)
+                BarFill.Size = UDim2.fromOffset(
+                    math.floor(elapsed * BarInner.AbsoluteSize.X), 14
+                )
+                RunService.Heartbeat:Wait()
+            end
+
+            ProgressLabel.Text = 'Loading... 100%'
+            BarFill.Size = UDim2.fromOffset(BarInner.AbsoluteSize.X, 14)
+            task.wait(0.18)
+
+            LoaderOuter.Visible = false
+
+            if type(callback) == 'function' then
+                callback()
+            end
+
+            if Loader._pending then
+                Loader._pending.Holder.Visible = true
+                task.spawn(Library.Toggle)
+            end
+        end)
+    end
+
+    function Loader:AddChoose(Info)
+        Info = Info or {}
+        if type(Info.Title)       ~= 'string' then Info.Title       = 'Game'  end
+        if type(Info.ButtonTitle) ~= 'string' then Info.ButtonTitle = 'Load'  end
+        if type(Info.Icon)        ~= 'string' then Info.Icon        = ''      end
+
+        local Card = Library:Create('Frame', {
+            BackgroundColor3 = Library.BackgroundColor,
+            BorderColor3     = Library.OutlineColor,
+            BorderMode       = Enum.BorderMode.Inset,
+            ZIndex           = 303,
+            Parent           = CardArea,
+        })
+
+        Library:AddToRegistry(Card, {
+            BackgroundColor3 = 'BackgroundColor',
+            BorderColor3     = 'OutlineColor',
+        })
+
+        local Icon = Library:Create('ImageLabel', {
+            AnchorPoint          = Vector2.new(0.5, 0),
+            BackgroundTransparency = 1,
+            Position             = UDim2.new(0.5, 0, 0, 10),
+            Size                 = UDim2.fromOffset(80, 80),
+            Image                = Info.Icon,
+            ZIndex               = 304,
+            Parent               = Card,
+        })
+
+        local TitleLabel = Library:CreateLabel({
+            AnchorPoint      = Vector2.new(0.5, 0),
+            Position         = UDim2.new(0.5, 0, 0, 98),
+            Size             = UDim2.new(1, -8, 0, 18),
+            Text             = Info.Title,
+            ZIndex           = 304,
+            Parent           = Card,
+        })
+
+        local BtnOuter = Library:Create('Frame', {
+            AnchorPoint      = Vector2.new(0.5, 1),
+            BackgroundColor3 = Color3.new(0, 0, 0),
+            BorderColor3     = Color3.new(0, 0, 0),
+            Position         = UDim2.new(0.5, 0, 1, -10),
+            Size             = UDim2.fromOffset(120, 22),
+            ZIndex           = 304,
+            Parent           = Card,
+        })
+
+        Library:AddToRegistry(BtnOuter, { BorderColor3 = 'Black' })
+
+        local BtnInner = Library:Create('Frame', {
+            BackgroundColor3 = Library.MainColor,
+            BorderColor3     = Library.OutlineColor,
+            BorderMode       = Enum.BorderMode.Inset,
+            Size             = UDim2.fromScale(1, 1),
+            ZIndex           = 305,
+            Parent           = BtnOuter,
+        })
+
+        Library:AddToRegistry(BtnInner, {
+            BackgroundColor3 = 'MainColor',
+            BorderColor3     = 'OutlineColor',
+        })
+
+        Library:Create('UIGradient', {
+            Color = ColorSequence.new({
+                ColorSequenceKeypoint.new(0, Color3.new(1, 1, 1)),
+                ColorSequenceKeypoint.new(1, Color3.fromRGB(212, 212, 212)),
+            }),
+            Rotation = 90,
+            Parent   = BtnInner,
+        })
+
+        local BtnLabel = Library:CreateLabel({
+            Size           = UDim2.fromScale(1, 1),
+            Text           = Info.ButtonTitle,
+            TextSize       = 10,
+            ZIndex         = 306,
+            Parent         = BtnInner,
+        })
+
+        Library:OnHighlight(BtnOuter, BtnOuter,
+            { BorderColor3 = 'AccentColor' },
+            { BorderColor3 = 'Black' }
+        )
+
+        Library:OnHighlight(Card, Card,
+            { BorderColor3 = 'AccentColor' },
+            { BorderColor3 = 'OutlineColor' }
+        )
+
+        BtnOuter.InputBegan:Connect(function(Input)
+            if Input.UserInputType ~= Enum.UserInputType.MouseButton1 then return end
+            if Library:MouseIsOverOpenedFrame() then return end
+            RunProgress(Info.Callback)
+        end)
+
+        table.insert(Loader.Choices, {
+            Card   = Card,
+            Info   = Info,
+        })
+
+        return {
+            Card     = Card,
+            Icon     = Icon,
+            Title    = TitleLabel,
+            Button   = BtnOuter,
+            BtnLabel = BtnLabel,
+        }
+    end
+
+    function Loader:AttachWindow(Win)
+        Loader._pending = Win
+        if Win and Win.Holder then
+            Win.Holder.Visible = false
+        end
+    end
+
+    Library._ActiveLoader = Loader
+    Library._LoaderOuter  = LoaderOuter
+
+    return Loader
+end
+
+function Library:SetLoader(State)
+    if not State then
+        if Library._LoaderOuter then
+            Library._LoaderOuter:Destroy()
+            Library._ActiveLoader = nil
+            Library._LoaderOuter  = nil
+        end
+        if Library._ActiveLoader and Library._ActiveLoader._pending then
+            Library._ActiveLoader._pending.Holder.Visible = true
+        end
+    end
+end
+
 function Library:SetWatermarkVisibility(Bool)
     Library.Watermark.Visible = Bool;
 end;
