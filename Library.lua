@@ -3903,6 +3903,9 @@ function Library:CreateWindow(...)
         if Fading then
             return;
         end;
+        if Library._ActiveLoader and Library._LoaderOuter and Library._LoaderOuter.Visible then
+            return
+        end
 
         local FadeTime = Config.MenuFadeTime;
         Fading = true;
@@ -3995,6 +3998,10 @@ function Library:CreateWindow(...)
     end
 
     Library:GiveSignal(InputService.InputBegan:Connect(function(Input, Processed)
+        if Library._ActiveLoader and Library._LoaderOuter and Library._LoaderOuter.Visible then
+            return
+        end
+
         if type(Library.ToggleKeybind) == 'table' and Library.ToggleKeybind.Type == 'KeyPicker' then
             if Input.UserInputType == Enum.UserInputType.Keyboard and Input.KeyCode.Name == Library.ToggleKeybind.Value then
                 task.spawn(Library.Toggle)
