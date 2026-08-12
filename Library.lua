@@ -2942,11 +2942,6 @@ function Library:CreateLoader(Config)
         Parent           = LoaderOuter,
     })
 
-    Library:AddToRegistry(LoaderInner, {
-        BackgroundColor3 = 'MainColor',
-        BorderColor3     = 'AccentColor',
-    })
-
     Library:CreateLabel({
         Position         = UDim2.fromOffset(7, 0),
         Size             = UDim2.new(1, -7, 0, 26),
@@ -2983,12 +2978,12 @@ function Library:CreateLoader(Config)
     })
 
     Library:Create('UIGridLayout', {
-    CellSize          = UDim2.fromOffset(196, 130),  -- было 210, стало 130
-    CellPadding       = UDim2.fromOffset(8, 8),
-    HorizontalAlignment = Enum.HorizontalAlignment.Center,
-    SortOrder         = Enum.SortOrder.LayoutOrder,
-    Parent            = CardArea,
-})
+        CellSize          = UDim2.fromOffset(196, 130),
+        CellPadding       = UDim2.fromOffset(8, 8),
+        HorizontalAlignment = Enum.HorizontalAlignment.Center,
+        SortOrder         = Enum.SortOrder.LayoutOrder,
+        Parent            = CardArea,
+    })
 
     local ProgressOverlay = Library:Create('Frame', {
         BackgroundColor3 = Library.BackgroundColor,
@@ -2998,9 +2993,7 @@ function Library:CreateLoader(Config)
         Visible          = false,
         Parent           = LoaderInner,
     })
-
-    Library:AddToRegistry(ProgressOverlay, { BackgroundColor3 = 'BackgroundColor' })
-
+    
     local ProgressLabel = Library:CreateLabel({
         AnchorPoint      = Vector2.new(0.5, 0.5),
         Position         = UDim2.fromScale(0.5, 0.42),
@@ -3041,12 +3034,6 @@ function Library:CreateLoader(Config)
         ZIndex           = 313,
         Parent           = BarInner,
     })
-
-    Library:AddToRegistry(BarFill, {
-        BackgroundColor3 = 'AccentColor',
-        BorderColor3     = 'AccentColorDark',
-    })
-
     local function RunProgress(callback)
         ProgressOverlay.Visible = true
 
@@ -3096,11 +3083,6 @@ function Library:CreateLoader(Config)
             Parent           = CardArea,
         })
 
-        Library:AddToRegistry(Card, {
-            BackgroundColor3 = 'BackgroundColor',
-            BorderColor3     = 'OutlineColor',
-        })
-
         local Icon = Library:Create('ImageLabel', {
             AnchorPoint          = Vector2.new(0.5, 0),
             BackgroundTransparency = 1,
@@ -3129,9 +3111,6 @@ function Library:CreateLoader(Config)
             ZIndex           = 304,
             Parent           = Card,
         })
-
-        Library:AddToRegistry(BtnOuter, { BorderColor3 = 'Black' })
-
         local BtnInner = Library:Create('Frame', {
             BackgroundColor3 = Library.MainColor,
             BorderColor3     = Library.OutlineColor,
@@ -3141,20 +3120,6 @@ function Library:CreateLoader(Config)
             Parent           = BtnOuter,
         })
 
-        Library:AddToRegistry(BtnInner, {
-            BackgroundColor3 = 'MainColor',
-            BorderColor3     = 'OutlineColor',
-        })
-
-        Library:Create('UIGradient', {
-            Color = ColorSequence.new({
-                ColorSequenceKeypoint.new(0, Color3.new(1, 1, 1)),
-                ColorSequenceKeypoint.new(1, Color3.fromRGB(212, 212, 212)),
-            }),
-            Rotation = 90,
-            Parent   = BtnInner,
-        })
-
         local BtnLabel = Library:CreateLabel({
             Size           = UDim2.fromScale(1, 1),
             Text           = Info.ButtonTitle,
@@ -3162,16 +3127,6 @@ function Library:CreateLoader(Config)
             ZIndex         = 306,
             Parent         = BtnInner,
         })
-
-        Library:OnHighlight(BtnOuter, BtnOuter,
-            { BorderColor3 = 'AccentColor' },
-            { BorderColor3 = 'Black' }
-        )
-
-        Library:OnHighlight(Card, Card,
-            { BorderColor3 = 'AccentColor' },
-            { BorderColor3 = 'OutlineColor' }
-        )
 
         BtnOuter.InputBegan:Connect(function(Input)
             if Input.UserInputType ~= Enum.UserInputType.MouseButton1 then return end
