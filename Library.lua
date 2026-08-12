@@ -1963,8 +1963,8 @@ do
         });
 
         Library:OnHighlight(ToggleRegion, ToggleOuter,
-            { BorderColor3 = 'AccentColor' },
-            { BorderColor3 = 'Black' }
+            { BorderColor3 = Toggle.Value and 'AccentColor' },
+            { BorderColor3 = Toggle.Value and 'AccentColor' }
         );
 
         function Toggle:UpdateColors()
@@ -1989,22 +1989,26 @@ do
         end;
 
         function Toggle:SetValue(Bool)
-            Bool = (not not Bool);
+    Bool = (not not Bool);
 
-            Toggle.Value = Bool;
-            Toggle:Display();
+    Toggle.Value = Bool;
+    Toggle:Display();
 
-            for _, Addon in next, Toggle.Addons do
-                if Addon.Type == 'KeyPicker' and Addon.SyncToggleState then
-                    Addon.Toggled = Bool
-                    Addon:Update()
-                end
-            end
+    -- Reset hover state so border doesn't stay lit after click
+    ToggleOuter.BorderColor3 = Toggle.Value and Library.AccentColorDark or Library.OutlineColor;
+    Library.RegistryMap[ToggleOuter].Properties.BorderColor3 = Toggle.Value and 'AccentColorDark' or 'OutlineColor';
 
-            Library:SafeCallback(Toggle.Callback, Toggle.Value);
-            Library:SafeCallback(Toggle.Changed, Toggle.Value);
-            Library:UpdateDependencyBoxes();
-        end;
+    for _, Addon in next, Toggle.Addons do
+        if Addon.Type == 'KeyPicker' and Addon.SyncToggleState then
+            Addon.Toggled = Bool
+            Addon:Update()
+        end
+    end
+
+    Library:SafeCallback(Toggle.Callback, Toggle.Value);
+    Library:SafeCallback(Toggle.Changed, Toggle.Value);
+    Library:UpdateDependencyBoxes();
+end;
 
         ToggleRegion.InputBegan:Connect(function(Input)
             if Input.UserInputType == Enum.UserInputType.MouseButton1 and not Library:MouseIsOverOpenedFrame() then
@@ -2012,6 +2016,17 @@ do
                 Library:AttemptSave();
             end;
         end);
+
+        ToggleRegion.MouseEnter:Connect(function()
+    if not Library:MouseIsOverOpenedFrame() then
+        ToggleOuter.BorderColor3 = Library.AccentColor
+    end
+end)
+
+ToggleRegion.MouseLeave:Connect(function()
+    ToggleOuter.BorderColor3 = Toggle.Value and Library.AccentColorDark or Library.Black
+    Library.RegistryMap[ToggleOuter].Properties.BorderColor3 = Toggle.Value and 'AccentColorDark' or 'Black'
+end)
 
         if Toggle.Risky then
             Library:RemoveFromRegistry(ToggleLabel)
