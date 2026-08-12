@@ -315,35 +315,46 @@ end
 
 function Library:OnHighlight(HighlightInstance, Instance, Properties, PropertiesDefault)
     HighlightInstance.MouseEnter:Connect(function()
-        local Reg = Library.RegistryMap[Instance];
+        if Library:MouseIsOverOpenedFrame() then return end
+
+        local Reg = Library.RegistryMap[Instance]
 
         for Property, ColorIdx in next, Properties do
             local Value = type(ColorIdx) == 'string' and (Library[ColorIdx] or ColorIdx) or ColorIdx
             if typeof(Value) ~= 'Color3' then continue end
 
-            Instance[Property] = Value;
+            Instance[Property] = Value
 
             if Reg and Reg.Properties[Property] then
-                Reg.Properties[Property] = ColorIdx;
-            end;
-        end;
+                Reg.Properties[Property] = ColorIdx
+            end
+        end
     end)
 
     HighlightInstance.MouseLeave:Connect(function()
-        local Reg = Library.RegistryMap[Instance];
+        local Reg = Library.RegistryMap[Instance]
 
         for Property, ColorIdx in next, PropertiesDefault do
             local Value = type(ColorIdx) == 'string' and (Library[ColorIdx] or ColorIdx) or ColorIdx
             if typeof(Value) ~= 'Color3' then continue end
 
-            Instance[Property] = Value;
-
+            -- Read the CURRENT registry value, not the passed-in default.
+            -- If SetValue/Display changed the registry after hover started, respect that.
+            local currentRegistryColor = ColorIdx
             if Reg and Reg.Properties[Property] then
-                Reg.Properties[Property] = ColorIdx;
-            end;
-        end;
+                currentRegistryColor = Reg.Properties[Property]
+            end
+
+            local resolvedValue = type(currentRegistryColor) == 'string'
+                and (Library[currentRegistryColor] or currentRegistryColor)
+                or currentRegistryColor
+
+            if typeof(resolvedValue) == 'Color3' then
+                Instance[Property] = resolvedValue
+            end
+        end
     end)
-end;
+end
 
 function Library:MouseIsOverOpenedFrame()
     for Frame, _ in next, Library.OpenedFrames do
