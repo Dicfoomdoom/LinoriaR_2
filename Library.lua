@@ -18,6 +18,8 @@ ProtectGui(ScreenGui);
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global;
 ScreenGui.Parent = CoreGui;
 
+ESPPreview = nil;
+
 local Toggles = {};
 local Options = {};
 
@@ -81,13 +83,13 @@ local Library = {
     Registry = {};     
     RegistryMap = {};     
     HudRegistry = {};     
-    FontColor = Color3.fromRGB(240, 240, 240);
-    MainColor = Color3.fromRGB(18, 18, 18);
-    BackgroundColor = Color3.fromRGB(12, 12, 12);
-    AccentColor = Color3.fromRGB(140, 140, 140);
-    OutlineColor = Color3.fromRGB(35, 35, 35);
-    RiskColor = Color3.fromRGB(220, 60, 60);
-    Black = Color3.fromRGB(5, 5, 5);
+FontColor = Color3.fromRGB(25, 25, 30);
+MainColor = Color3.fromRGB(232, 235, 241);
+BackgroundColor = Color3.fromRGB(215, 219, 228);
+AccentColor = Color3.fromRGB(75, 115, 215);
+OutlineColor = Color3.fromRGB(175, 180, 192);
+RiskColor = Color3.fromRGB(200, 40, 40);
+Black = Color3.fromRGB(155, 160, 172);
     
     Font = CustomFont;     
     OpenedFrames = {};     
@@ -3711,7 +3713,321 @@ local function OnPlayerChange()
 end;
 
 Players.PlayerAdded:Connect(OnPlayerChange);
-Players.PlayerRemoving:Connect(OnPlayerChange);
+Players.PlayerRemoving:Connect(OnPlayerChange);ч
+
+-- ================================================================
+--  Library:CreateESPPreview()
+--  Создаёт превью-окно 450x650, видимое только когда меню закрыто.
+--  Метод обновления: Library.ESPPreview:Set("Box", true/false)
+-- ================================================================
+function Library:CreateESPPreview(Config)
+    Config = Config or {}
+
+    local CHAMS_PARTS = { "Head", "Torso", "Left Arm", "Right Arm", "Left Leg", "Right Leg" }
+
+    local previewGui = Instance.new("ScreenGui")
+    previewGui.Name = "LibESPPreview"
+    previewGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+    previewGui.ResetOnSpawn = false
+    local protect = protectgui or (syn and syn.protect_gui) or function() end
+    protect(previewGui)
+    previewGui.Parent = Library.ScreenGui.Parent -- CoreGui
+
+    -- Внешняя обёртка (border-frame)
+    local outerFrame = Library:Create("Frame", {
+        BackgroundColor3 = Color3.new(0, 0, 0),
+        BorderSizePixel  = 0,
+        Position         = UDim2.fromOffset(10, 10),
+        Size             = UDim2.fromOffset(452, 652),
+        Visible          = false,
+        ZIndex           = 60,
+        Parent           = previewGui,
+    })
+
+    local innerFrame = Library:Create("Frame", {
+        BackgroundColor3 = Library.MainColor,
+        BorderColor3     = Library.AccentColor,
+        BorderMode       = Enum.BorderMode.Inset,
+        Position         = UDim2.fromOffset(1, 1),
+        Size             = UDim2.new(1, -2, 1, -2),
+        ZIndex           = 61,
+        Parent           = outerFrame,
+    })
+    Library:AddToRegistry(innerFrame, { BackgroundColor3 = "MainColor"; BorderColor3 = "AccentColor" })
+
+    local accentBar = Library:Create("Frame", {
+        BackgroundColor3 = Library.AccentColor,
+        BorderSizePixel  = 0,
+        Size             = UDim2.new(1, 0, 0, 2),
+        ZIndex           = 62,
+        Parent           = innerFrame,
+    })
+    Library:AddToRegistry(accentBar, { BackgroundColor3 = "AccentColor" })
+
+    Library:CreateLabel({
+        Position       = UDim2.fromOffset(8, 4),
+        Size           = UDim2.new(1, -16, 0, 18),
+        Text           = "esp preview",
+        TextSize       = 10,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        ZIndex         = 63,
+        Parent         = innerFrame,
+    })
+
+    -- ViewportFrame
+    local viewport = Library:Create("ViewportFrame", {
+        BackgroundColor3 = Library.BackgroundColor,
+        BorderColor3     = Library.OutlineColor,
+        BorderMode       = Enum.BorderMode.Inset,
+        Position         = UDim2.fromOffset(8, 26),
+        Size             = UDim2.new(1, -16, 1, -34),
+        LightColor       = Color3.fromRGB(255, 255, 255),
+        LightDirection   = Vector3.new(-1, -2, -1),
+        Ambient          = Color3.fromRGB(160, 160, 160),
+        ZIndex           = 62,
+        Parent           = innerFrame,
+    })
+    Library:AddToRegistry(viewport, { BackgroundColor3 = "BackgroundColor"; BorderColor3 = "OutlineColor" })
+
+    local vpCam = Instance.new("Camera")
+    vpCam.Parent = viewport
+    viewport.CurrentCamera = vpCam
+
+    -- State
+    local Preview = {
+        Enabled  = false,
+        Features = { Box = false, Name = false, Health = false, Weapon = false, Chams = false },
+        _clone   = nil,
+        _hrp     = nil,
+    }
+
+    -- Drawing поверх viewport
+    local drawings = {}
+
+    local function newSquare(filled, thickness, color)
+        local d = Drawing.new("Square")
+        d.Filled       = filled
+        d.Thickness    = thickness
+        d.Transparency = 1
+        d.Color        = color
+        d.Visible      = false
+        return d
+    end
+
+    local function newText(size, color)
+        local d = Drawing.new("Text")
+        d.Size         = size
+        d.Font         = 1
+        d.Center       = true
+        d.Outline      = true
+        d.OutlineColor = Color3.new(0, 0, 0)
+        d.Color        = color
+        d.Visible      = false
+        return d
+    end
+
+    drawings.Box      = newSquare(false, 1,    Color3.fromRGB(255, 255, 255))
+    drawings.BoxOut   = newSquare(false, 1.5,  Color3.fromRGB(0, 0, 0))
+    drawings.Health   = newSquare(true,  0.5,  Color3.fromRGB(80, 220, 80))
+    drawings.HealthOL = newSquare(false, 0.6,  Color3.fromRGB(0, 0, 0))
+    drawings.Name     = newText(13, Color3.fromRGB(255, 255, 255))
+    drawings.Weapon   = newText(11, Color3.fromRGB(255, 255, 255))
+
+    -- Вспомогательная w2s через vpCam в экранные координаты
+    local function vpW2S(pos)
+        local vpAbs = viewport.AbsolutePosition
+        local sp, vis = vpCam:WorldToViewportPoint(pos)
+        if not vis or sp.Z <= 0 then return nil end
+        return Vector2.new(vpAbs.X + sp.X, vpAbs.Y + sp.Y)
+    end
+
+    -- Сборка клона персонажа
+    local function buildClone(player)
+        if Preview._clone then
+            Preview._clone:Destroy()
+            Preview._clone = nil
+            Preview._hrp   = nil
+        end
+
+        local char = player and player.Character
+        if not char then return end
+
+        local clone = char:Clone()
+        for _, v in ipairs(clone:GetDescendants()) do
+            if v:IsA("Script") or v:IsA("LocalScript")
+            or v:IsA("RemoteEvent") or v:IsA("BindableEvent") then
+                v:Destroy()
+            end
+        end
+
+        local hrp = clone:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            hrp.CFrame   = CFrame.new(0, 0, 0)
+            hrp.Anchored = true
+        end
+
+        local hum = clone:FindFirstChildOfClass("Humanoid")
+        if hum then hum:ChangeState(Enum.HumanoidStateType.None) end
+
+        clone.Parent   = viewport
+        Preview._clone = clone
+        Preview._hrp   = hrp
+
+        -- Позиция камеры: смотрит на торс спереди
+        local torso = clone:FindFirstChild("Torso") or clone:FindFirstChild("UpperTorso")
+        local tPos  = torso and torso.Position or Vector3.new(0, 0, 0)
+        vpCam.CFrame = CFrame.new(tPos + Vector3.new(0, 1.2, 4.5), tPos + Vector3.new(0, 0.8, 0))
+    end
+
+    -- Публичный метод: Preview:Set("Box") или Preview:Set("Box", true)
+    function Preview:Set(feature, value)
+        if self.Features[feature] == nil then return end
+        self.Features[feature] = (value == nil) and (not self.Features[feature]) or value
+    end
+
+    -- Публичный метод: Preview:Enable(bool)
+    function Preview:Enable(value)
+        self.Enabled = (value == nil) and (not self.Enabled) or value
+    end
+
+    -- Рендер-цикл
+    local rs = game:GetService("RunService")
+    Library:GiveSignal(rs.RenderStepped:Connect(function()
+        -- Видимость: только когда главное меню скрыто
+        local menuOpen = false
+        for _, w in ipairs(Library.ScreenGui:GetChildren()) do
+            if w:IsA("Frame") and w.Visible then
+                menuOpen = true
+                break
+            end
+        end
+
+        outerFrame.Visible = Preview.Enabled and (not menuOpen)
+
+        if not outerFrame.Visible then
+            for _, d in pairs(drawings) do d.Visible = false end
+            return
+        end
+
+        -- Пересобрать клон если надо
+        local lp = game:GetService("Players").LocalPlayer
+        if not Preview._clone or not Preview._clone.Parent then
+            buildClone(lp)
+        end
+
+        local clone = Preview._clone
+        if not clone then
+            for _, d in pairs(drawings) do d.Visible = false end
+            return
+        end
+
+        local head  = clone:FindFirstChild("Head")
+        local hrp   = clone:FindFirstChild("HumanoidRootPart")
+        local hum   = clone:FindFirstChildOfClass("Humanoid")
+
+        if not head or not hrp then
+            for _, d in pairs(drawings) do d.Visible = false end
+            return
+        end
+
+        -- Лёгкая анимация поворота
+        hrp.CFrame = CFrame.new(0, 0, 0) * CFrame.Angles(0, math.sin(tick() * 0.6) * 0.3, 0)
+
+        -- Вычисляем box
+        local topV    = vpW2S(head.Position + Vector3.new(0, head.Size.Y * 1.4, 0))
+        local bottomV = vpW2S(hrp.Position  - Vector3.new(0, hrp.Size.Y * 2.0,  0))
+        local centerV = vpW2S(hrp.Position)
+
+        if not topV or not bottomV or not centerV then
+            for _, d in pairs(drawings) do d.Visible = false end
+            return
+        end
+
+        local bH = math.abs(bottomV.Y - topV.Y)
+        local bW = bH * 0.85
+        local bX = centerV.X - bW * 0.5
+        local bY = topV.Y
+
+        -- BOX
+        local showBox = Preview.Features.Box
+        drawings.Box.Visible    = showBox
+        drawings.BoxOut.Visible = showBox
+        if showBox then
+            drawings.Box.Position    = Vector2.new(bX,     bY)
+            drawings.Box.Size        = Vector2.new(bW,     bH)
+            drawings.BoxOut.Position = Vector2.new(bX - 1, bY - 1)
+            drawings.BoxOut.Size     = Vector2.new(bW + 2, bH + 2)
+        end
+
+        -- NAME
+        drawings.Name.Visible = Preview.Features.Name
+        if Preview.Features.Name then
+            drawings.Name.Text     = string.lower(lp.Name)
+            drawings.Name.Position = Vector2.new(centerV.X, bY - 15)
+        end
+
+        -- HEALTH
+        local showHP = Preview.Features.Health
+        drawings.Health.Visible  = showHP
+        drawings.HealthOL.Visible = showHP
+        if showHP and hum and hum.MaxHealth > 0 then
+            local pct  = math.clamp(hum.Health / hum.MaxHealth, 0, 1)
+            local bw2  = 2
+            local bxHP = bX - 5.5
+            drawings.HealthOL.Position = Vector2.new(bxHP - 0.75, bY)
+            drawings.HealthOL.Size     = Vector2.new(bw2 + 1.5, bH)
+            drawings.Health.Position   = Vector2.new(bxHP, bY + bH * (1 - pct))
+            drawings.Health.Size       = Vector2.new(bw2, bH * pct)
+            drawings.Health.Color      = Color3.fromHSV(pct * 0.33, 1, 1)
+        end
+
+        -- WEAPON
+        drawings.Weapon.Visible = Preview.Features.Weapon
+        if Preview.Features.Weapon then
+            local char = lp.Character
+            local tool = char and char:FindFirstChildOfClass("Tool")
+            drawings.Weapon.Text     = tool and string.lower(tool.Name) or "none"
+            drawings.Weapon.Position = Vector2.new(centerV.X, bY + bH + 3)
+        end
+
+        -- CHAMS
+        if Preview.Features.Chams then
+            for _, pn in ipairs(CHAMS_PARTS) do
+                local part = clone:FindFirstChild(pn)
+                if part and not part:FindFirstChildOfClass("BoxHandleAdornment") then
+                    local a = Instance.new("BoxHandleAdornment")
+                    a.Adornee      = part
+                    a.Size         = part.Size + Vector3.new(0.05, 0.05, 0.05)
+                    a.Color3       = Color3.fromRGB(255, 255, 255)
+                    a.Transparency = 0.5
+                    a.AlwaysOnTop  = true
+                    a.ZIndex       = 2
+                    a.CFrame       = CFrame.new()
+                    a.Parent       = part
+                end
+            end
+        else
+            for _, pn in ipairs(CHAMS_PARTS) do
+                local part = clone:FindFirstChild(pn)
+                if part then
+                    for _, v in ipairs(part:GetChildren()) do
+                        if v:IsA("BoxHandleAdornment") then v:Destroy() end
+                    end
+                end
+            end
+        end
+    end))
+
+    -- Пересобираем клон при CharacterAdded
+    game:GetService("Players").LocalPlayer.CharacterAdded:Connect(function()
+        task.delay(1, function() buildClone(game:GetService("Players").LocalPlayer) end)
+    end)
+
+    task.delay(1, function() buildClone(game:GetService("Players").LocalPlayer) end)
+
+    Library.ESPPreview = Preview
+    return Preview
+end
 
 getgenv().Library = Library
 return Library
