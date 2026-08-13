@@ -3093,6 +3093,16 @@ function Library:CreateLoader(Config)
             Parent           = CardArea,
         })
 
+        Library:AddToRegistry(Card, {
+            BackgroundColor3 = 'BackgroundColor',
+            BorderColor3     = 'OutlineColor',
+        })
+
+        Library:OnHighlight(Card, Card,
+            { BorderColor3 = 'AccentColor' },
+            { BorderColor3 = 'OutlineColor' }
+        )
+
         local Icon = Library:Create('ImageLabel', {
             AnchorPoint          = Vector2.new(0.5, 0),
             BackgroundTransparency = 1,
@@ -3113,22 +3123,37 @@ function Library:CreateLoader(Config)
         })
 
         local BtnOuter = Library:Create('Frame', {
-            AnchorPoint      = Vector2.new(0.5, 1),
-            BackgroundColor3 = Color3.new(0, 0, 0),
-            BorderColor3     = Color3.new(0, 0, 0),
-            Position         = UDim2.new(0.5, 0, 1, -10),
-            Size             = UDim2.fromOffset(120, 22),
-            ZIndex           = 304,
-            Parent           = Card,
-        })
-        local BtnInner = Library:Create('Frame', {
-            BackgroundColor3 = Library.MainColor,
-            BorderColor3     = Library.OutlineColor,
-            BorderMode       = Enum.BorderMode.Inset,
-            Size             = UDim2.fromScale(1, 1),
-            ZIndex           = 305,
-            Parent           = BtnOuter,
-        })
+    AnchorPoint      = Vector2.new(0.5, 1),
+    BackgroundColor3 = Color3.new(0, 0, 0),
+    BorderColor3     = Color3.new(0, 0, 0),
+    Position         = UDim2.new(0.5, 0, 1, -10),
+    Size             = UDim2.fromOffset(120, 22),
+    ZIndex           = 304,
+    Parent           = Card,
+})
+local BtnInner = Library:Create('Frame', {
+    BackgroundColor3 = Library.MainColor,
+    BorderColor3     = Library.OutlineColor,
+    BorderMode       = Enum.BorderMode.Inset,
+    Size             = UDim2.fromScale(1, 1),
+    ZIndex           = 305,
+    Parent           = BtnOuter,
+})
+
+Library:AddToRegistry(BtnInner, {
+    BackgroundColor3 = 'MainColor',
+    BorderColor3     = 'OutlineColor',
+})
+
+Library:OnHighlight(BtnOuter, BtnOuter,
+    { BorderColor3 = 'AccentColor' },
+    { BorderColor3 = 'Black' }
+)
+
+Library:OnHighlight(BtnOuter, BtnInner,
+    { BackgroundColor3 = 'AccentColor', BorderColor3 = 'AccentColorDark' },
+    { BackgroundColor3 = 'MainColor',   BorderColor3 = 'OutlineColor'    }
+)
 
         local BtnLabel = Library:CreateLabel({
             Size           = UDim2.fromScale(1, 1),
